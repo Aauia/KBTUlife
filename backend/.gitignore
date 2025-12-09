@@ -1,0 +1,53 @@
+# --------------------------
+# Python
+# --------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.py[cod]
+*.log
+*.pot
+*.py~ 
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# --------------------------
+# Django
+# --------------------------
+*.sqlite3
+db.sqlite3
+/staticfiles/
+media/
+*.log
+*.pot
+*.pyc
+*.mo
+*.DS_Store
+
+# Migrations (optional, but usually tracked in Git)
+*/migrations/*.pyc
+*/migrations/*.py~
+
+# --------------------------
+# Environment variables
+# --------------------------
+.env
+.env.*
+
+# --------------------------
+# Docker
+# --------------------------
+*.env
+docker-compose.override.yml
+
+# --------------------------
+# IDE / Editor
+# --------------------------
+.vscode/
+.idea/
+*.swp
+*.swo

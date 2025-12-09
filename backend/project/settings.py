@@ -15,13 +15,16 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    "users",
     'drf_yasg',
+    'api',
+    
 ]
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -45,7 +48,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "project.wsgi.application"
 
-AUTH_USER_MODEL = "users.User"
+# settings.py
+
+AUTH_USER_MODEL = 'api.CustomUser'
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
 
 DATABASES = {
     "default": {
@@ -57,6 +65,15 @@ DATABASES = {
         "PORT": os.getenv("POSTGRES_PORT"),
     }
 }
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+}
+
 
 AUTH_PASSWORD_VALIDATORS = []
 
@@ -64,7 +81,8 @@ LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
+# settings.py
 STATIC_URL = '/static/'
-STATIC_ROOT = '/app/staticfiles'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = []
 
