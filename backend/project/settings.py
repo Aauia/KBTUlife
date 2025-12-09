@@ -17,7 +17,13 @@ INSTALLED_APPS = [
     "rest_framework",
     'drf_yasg',
     'api',
-    
+    'modeltranslation',
+
+    'news',
+    'clubs',
+    'events',
+    'tickets',
+    'reviews',
 ]
 
 
@@ -86,3 +92,10 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = []
 
+LANGUAGES = [
+    ('kk', 'Kazakh'),
+    ('ru', 'Russian'),
+    ('en', 'English'),
+]
+
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'ru'

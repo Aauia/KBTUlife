@@ -9,6 +9,8 @@ __pycache__/
 *.log
 *.pot
 *.py~ 
+*.DS_Store
+backend/staticfiles/
 
 # Virtual environment
 venv/
