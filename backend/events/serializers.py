@@ -25,13 +25,22 @@ class EventSerializer(serializers.ModelSerializer):
         ]
 
     def get_name(self, obj):
-        lang = self.context.get('request').LANGUAGE_CODE
-        return getattr(obj, f"name_{lang}", obj.name)
+        lang = translation.get_language()
+        value = getattr(obj, f"name_{lang}", None)
+        if not value:
+            value = getattr(obj, f"name_ru", obj.name)  # fallback на русский
+        return value
 
     def get_description(self, obj):
-        lang = self.context.get('request').LANGUAGE_CODE
-        return getattr(obj, f"description_{lang}", obj.description)
+        lang = translation.get_language()
+        value = getattr(obj, f"description_{lang}", None)
+        if not value:
+            value = getattr(obj, f"description_ru", obj.description)
+        return value
 
     def get_location(self, obj):
-        lang = self.context.get('request').LANGUAGE_CODE
-        return getattr(obj, f"location_{lang}", obj.location)
+        lang = translation.get_language()
+        value = getattr(obj, f"location_{lang}", None)
+        if not value:
+            value = getattr(obj, f"location_ru", obj.location)
+        return value

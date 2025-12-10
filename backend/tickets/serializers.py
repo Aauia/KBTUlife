@@ -8,11 +8,9 @@ from django.core.files.base import ContentFile
 import base64
 
 class TicketSerializer(serializers.ModelSerializer):
-    # Включаем данные пользователя и события
     user_email = serializers.CharField(source='user.outlook', read_only=True)
     event = EventSerializer(read_only=True)
     
-    # Можно вернуть QR код как Base64, чтобы фронт его отображал
     qr_code_image = serializers.SerializerMethodField()
 
     class Meta:
@@ -29,6 +27,5 @@ class TicketSerializer(serializers.ModelSerializer):
         return f"data:image/png;base64,{image_str}"
 
     def create(self, validated_data):
-        # При создании автоматически генерируется UUID (в модели)
         ticket = Ticket.objects.create(**validated_data)
         return ticket
