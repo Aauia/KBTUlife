@@ -10,6 +10,9 @@ class EventCategory(models.TextChoices):
     OFFSITE = 'offsite', _('Выездное / Сырттағы іс-шара / Offsite')
     PARTIES = 'parties', _('Вечеринки / Вечеринкалар / Parties')
     GAMES = 'games', _('Игры / Ойындар / Games')
+    HACKATHONS = 'Hackathons', _('Хакатоны / Хакатондар / Hackathons')
+    WORKSHOPS = 'Workshops', _('Воркшопы / Воркшоптар / Workshops')
+
 
 class Event(models.Model):
     name = models.CharField(max_length=200)
