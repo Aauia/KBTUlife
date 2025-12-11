@@ -15,3 +15,4 @@ class TicketViewSet(viewsets.ModelViewSet):
         buffer = BytesIO()
         qr.save(buffer)
         ticket.save()
+        ticket.qr_image.save(f'{ticket.qrcode}.png', ContentFile(buffer.getvalue()), save=True)

@@ -27,5 +27,10 @@ class TicketSerializer(serializers.ModelSerializer):
         return f"data:image/png;base64,{image_str}"
 
     def create(self, validated_data):
+        event = validated_data['event']
+        if event.tickets_available <= 0:
+            raise serializers.ValidationError("No tickets")
         ticket = Ticket.objects.create(**validated_data)
+        event.tickets_available -= 1
+        event.save()
         return ticket
