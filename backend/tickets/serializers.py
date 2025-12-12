@@ -1,10 +1,8 @@
 from rest_framework import serializers
 from .models import Ticket, Event
 from events.serializers import EventSerializer
-from api.models import CustomUser
 import qrcode
 from io import BytesIO
-from django.core.files.base import ContentFile
 import base64
 
 class TicketSerializer(serializers.ModelSerializer):
@@ -20,8 +18,8 @@ class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = ['id', 'user', 'user_email', 'event', 'event_id', 'qrcode', 
-                'paid', 'used', 'created_at', 'qr_code_image']
-        read_only_fields = ['qrcode', 'created_at', 'qr_code_image']
+                 'payment_status', 'used', 'used_at', 'notes', 'created_at', 'qr_code_image']
+        read_only_fields = ['payment_status','qrcode', 'created_at', 'qr_code_image', 'used', 'used_at', 'notes',]
 
     def get_qr_code_image(self, obj):
         if not obj.qrcode:
