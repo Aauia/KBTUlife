@@ -17,9 +17,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 class LoginSerializer(serializers.Serializer):
-    outlook = serializers.EmailField()
-    password = serializers.CharField(write_only=True)
-
+    outlook = serializers.EmailField(required=True)
+    password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
+    
     def validate(self, data):
         user = authenticate(username=data['outlook'], password=data['password'])
         if user and user.is_active:

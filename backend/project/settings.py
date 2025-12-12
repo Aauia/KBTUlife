@@ -18,12 +18,12 @@ INSTALLED_APPS = [
     'drf_yasg',
     'api',
     'modeltranslation',
-
     'news',
     'clubs',
     'events',
     'tickets',
     'reviews',
+    'clubmanager',
 ]
 
 

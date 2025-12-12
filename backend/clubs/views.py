@@ -104,3 +104,15 @@ class ClubMembersListAPIView(generics.ListAPIView):
 
         club_id = self.kwargs['pk']
         return Membership.objects.filter(club_id=club_id, status='accepted')
+    
+    
+class UserClubsListAPIView(generics.ListAPIView):
+    serializer_class = ClubSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        return Club.objects.filter(
+            memberships__user_id=user_id,
+            memberships__status='accepted'
+        )

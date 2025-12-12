@@ -7,7 +7,7 @@ class Club(models.Model):
     description = models.TextField()
     instagram_link = models.URLField(blank=True, null=True)
     telegram_link = models.URLField(blank=True, null=True)
-    manager = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name='managed_clubs')
+    manager = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name='clubs_managed_directly')
 
     # Members via Membership model
     members = models.ManyToManyField(CustomUser, through='Membership', related_name='clubs')
