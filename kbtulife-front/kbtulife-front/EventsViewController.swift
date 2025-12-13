@@ -4,7 +4,7 @@ class EventsViewController: UIViewController {
     private let tableView = UITableView()
     private var events: [Event] = []
     
-    private let filterButton = UIBarButtonItem(title: "Фильтры", style: .plain, target: self, action: #selector(showFilters))
+    private let filterButton = UIBarButtonItem(title: "Фильтры", style: .plain, target: EventsViewController.self, action: #selector(showFilters))
     
     override func viewDidLoad() {
         super.viewDidLoad()
