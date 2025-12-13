@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		DA18FA322EEC422300ECB782 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DA18FA312EEC422300ECB782 /* Alamofire */; };
+		DAA5E94B2EED8EE800DCFFCE /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = DAA5E94A2EED8EE800DCFFCE /* SDWebImage */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,6 +70,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DAA5E94B2EED8EE800DCFFCE /* SDWebImage in Frameworks */,
 				DA18FA322EEC422300ECB782 /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -131,6 +133,7 @@
 			name = "kbtulife-front";
 			packageProductDependencies = (
 				DA18FA312EEC422300ECB782 /* Alamofire */,
+				DAA5E94A2EED8EE800DCFFCE /* SDWebImage */,
 			);
 			productName = "kbtulife-front";
 			productReference = DA18F9FC2EEC3E7000ECB782 /* kbtulife-front.app */;
@@ -217,6 +220,7 @@
 			packageReferences = (
 				DA18FA302EEC422300ECB782 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				DAA5E9042EED804500DCFFCE /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				DAA5E9492EED8EE800DCFFCE /* XCRemoteSwiftPackageReference "SDWebImage" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DA18F9FD2EEC3E7000ECB782 /* Products */;
@@ -591,6 +595,14 @@
 				minimumVersion = 8.6.2;
 			};
 		};
+		DAA5E9492EED8EE800DCFFCE /* XCRemoteSwiftPackageReference "SDWebImage" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImage";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.21.5;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -598,6 +610,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DA18FA302EEC422300ECB782 /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
+		};
+		DAA5E94A2EED8EE800DCFFCE /* SDWebImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DAA5E9492EED8EE800DCFFCE /* XCRemoteSwiftPackageReference "SDWebImage" */;
+			productName = SDWebImage;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

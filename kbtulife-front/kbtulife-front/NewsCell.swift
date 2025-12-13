@@ -1,10 +1,11 @@
 import UIKit
+import SDWebImage  
 
 class NewsCell: UITableViewCell {
     private let titleLabel = UILabel()
     private let previewLabel = UILabel()
     private let thumbnailImageView = UIImageView()
-
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -25,7 +26,6 @@ class NewsCell: UITableViewCell {
         thumbnailImageView.contentMode = .scaleAspectFill
         thumbnailImageView.clipsToBounds = true
         thumbnailImageView.layer.cornerRadius = 8
-        thumbnailImageView.backgroundColor = .systemGray4
         
         contentView.addSubview(thumbnailImageView)
         contentView.addSubview(titleLabel)
@@ -51,23 +51,12 @@ class NewsCell: UITableViewCell {
             previewLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
             previewLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -16)
         ])
-        
-        accessoryType = .disclosureIndicator
     }
     
     func configure(with news: NewsItem) {
         titleLabel.text = news.title
-        previewLabel.text = news.content.prefix(120) + "..."
+        previewLabel.text = String(news.content.prefix(100)) + "..."
         
-        thumbnailImageView.image = nil  // placeholder
-        if let urlString = news.imageUrl, let url = URL(string: urlString) {
-            URLSession.shared.dataTask(with: url) { data, _, _ in
-                if let data = data, let image = UIImage(data: data) {
-                    DispatchQueue.main.async {
-                        self.thumbnailImageView.image = image
-                    }
-                }
-            }.resume()
-        }
+        thumbnailImageView.sd_setImage(with: URL(string: news.imageUrl ?? ""), placeholderImage: UIImage(systemName: "photo"))
     }
 }

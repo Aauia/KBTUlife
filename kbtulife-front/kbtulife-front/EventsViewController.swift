@@ -3,27 +3,38 @@ import UIKit
 class EventsViewController: UIViewController {
     private let tableView = UITableView()
     private var events: [Event] = []
-    private let filterButton = UIBarButtonItem(title: "Filters", style: .plain, target: self, action: #selector(showFilters))
+    
+    private let filterButton = UIBarButtonItem(title: "Фильтры", style: .plain, target: self, action: #selector(showFilters))
     
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Events"
         navigationItem.rightBarButtonItem = filterButton
         
-        // register EventCell
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.register(EventCell.self, forCellReuseIdentifier: "EventCell")
+        view.addSubview(tableView)
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+        
         fetchEvents()
     }
     
     private func fetchEvents(filters: [String: String] = [:]) {
-        var url = "events/"
-        if !filters.isEmpty {
-            let query = filters.map { "\($0.key)=\($0.value)" }.joined(separator: "&")
-            url += "?\(query)"
-        }
-        NetworkManager.shared.get(url: url) { [weak self] (events: [Event]?, error) in
-            if let events = events {
-                self?.events = events
-                DispatchQueue.main.async { self?.tableView.reloadData() }
+        NetworkManager.shared.fetchEvents(filters: filters) { [weak self] events, error in
+            DispatchQueue.main.async {
+                if let events = events {
+                    self?.events = events
+                    self?.tableView.reloadData()
+                } else {
+                    print("Error fetching events: \(error?.localizedDescription ?? "Unknown")")
+                }
             }
         }
     }
@@ -33,14 +44,26 @@ class EventsViewController: UIViewController {
         filterVC.onApply = { [weak self] filters in
             self?.fetchEvents(filters: filters)
         }
-        present(UINavigationController(rootViewController: filterVC), animated: true)
+        let nav = UINavigationController(rootViewController: filterVC)
+        present(nav, animated: true)
     }
 }
 
-// FiltersViewController.swift (modal sheet)
-class FiltersViewController: UIViewController {
-    var onApply: (([String: String]) -> Void)?
-    private let freeSwitch = UISwitch()
-    private let categoryPicker = UIPickerView()  // categories: ярмарки, семинары, guest lectures, психолог, выездное, parties, games
+// MARK: UITableViewDataSource & Delegate
+extension EventsViewController: UITableViewDataSource, UITableViewDelegate {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        events.count
+    }
     
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "EventCell", for: indexPath) as! EventCell
+        cell.configure(with: events[indexPath.row])
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let detailVC = EventDetailViewController(event: events[indexPath.row])
+        navigationController?.pushViewController(detailVC, animated: true)
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
 }

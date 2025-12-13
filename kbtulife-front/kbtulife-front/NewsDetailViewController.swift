@@ -1,13 +1,14 @@
 import UIKit
+import SDWebImage
 
 class NewsDetailViewController: UIViewController {
     private let news: NewsItem
     
-    private let titleLabel = UILabel()
-    private let contentLabel = UILabel()
-    private let imageView = UIImageView()
     private let scrollView = UIScrollView()
     private let contentView = UIView()
+    private let imageView = UIImageView()
+    private let titleLabel = UILabel()
+    private let contentLabel = UILabel()
     
     init(news: NewsItem) {
         self.news = news
@@ -20,12 +21,12 @@ class NewsDetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "News Detail"
+        title = news.title
         view.backgroundColor = .systemBackground
         
         setupScrollView()
         setupUI()
-        configure(with: news)
+        configure()
     }
     
     private func setupScrollView() {
@@ -50,21 +51,19 @@ class NewsDetailViewController: UIViewController {
     }
     
     private func setupUI() {
+        imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 12
+        
         titleLabel.font = .boldSystemFont(ofSize: 24)
         titleLabel.numberOfLines = 0
         
         contentLabel.font = .systemFont(ofSize: 16)
         contentLabel.numberOfLines = 0
         
-        imageView.contentMode = .scaleAspectFit
-        imageView.clipsToBounds = true
-        imageView.backgroundColor = .systemGray5
-        imageView.heightAnchor.constraint(equalToConstant: 200).isActive = true
-        
         let stack = UIStackView(arrangedSubviews: [imageView, titleLabel, contentLabel])
         stack.axis = .vertical
         stack.spacing = 16
-        stack.alignment = .fill
         
         contentView.addSubview(stack)
         stack.translatesAutoresizingMaskIntoConstraints = false
@@ -74,21 +73,13 @@ class NewsDetailViewController: UIViewController {
             stack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             stack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16)
         ])
+        
+        imageView.heightAnchor.constraint(equalToConstant: 200).isActive = true
     }
     
-    private func configure(with news: NewsItem) {
+    private func configure() {
         titleLabel.text = news.title
         contentLabel.text = news.content
-        
-        // Загрузка изображения, если есть
-        if let urlString = news.imageUrl, let url = URL(string: urlString) {
-            URLSession.shared.dataTask(with: url) { data, _, _ in
-                if let data = data, let image = UIImage(data: data) {
-                    DispatchQueue.main.async {
-                        self.imageView.image = image
-                    }
-                }
-            }.resume()
-        }
+        imageView.sd_setImage(with: URL(string: news.imageUrl ?? ""), placeholderImage: UIImage(systemName: "photo"))
     }
 }

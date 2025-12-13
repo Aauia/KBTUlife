@@ -3,7 +3,7 @@ import Foundation
 
 class NetworkManager {
     static let shared = NetworkManager()
-    private let baseURL = "http://0.0.0.0:8000/api/"
+    private let baseURL = "http://0.0.0.0:8000/"
     
     private var headers: HTTPHeaders {
         var h = HTTPHeaders()
@@ -83,6 +83,28 @@ class NetworkManager {
                     completion(nil, error)
                 }
             }
+    }
+    // Загрузка событий (с фильтрами)
+    func fetchEvents(filters: [String: String] = [:], completion: @escaping ([Event]?, Error?) -> Void) {
+        var url = "events/"
+        if !filters.isEmpty {
+            let query = filters.map { "\($0.key)=\($0.value)" }.joined(separator: "&")
+            url += "?\(query)"
+        }
+        
+        AF.request(baseURL + url, headers: headers).responseDecodable(of: [Event].self) { response in
+            switch response.result {
+            case .success(let events):
+                completion(events, nil)
+            case .failure(let error):
+                completion(nil, error)
+            }
+        }
+    }
+    func login(outlook: String, password: String, completion: @escaping (Bool, Error?) -> Void) {
+        // Заглушка — всегда успех
+        UserDefaults.standard.set("fake_token", forKey: "authToken")
+        completion(true, nil)
     }
     // Загрузка моих билетов
     func fetchMyTickets(completion: @escaping ([Ticket]?, Error?) -> Void) {
