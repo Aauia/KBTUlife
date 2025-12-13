@@ -9,7 +9,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
         
         if UserDefaults.standard.string(forKey: "authToken") != nil {
-            window.rootViewController = MainTabBarController()
+            window.rootViewController = OnboardingViewController()
         } else {
             let authNav = UINavigationController(rootViewController: OnboardingViewController())
             window.rootViewController = authNav
