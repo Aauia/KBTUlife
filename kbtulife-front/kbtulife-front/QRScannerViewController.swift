@@ -54,17 +54,21 @@ class QRScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsD
         NetworkManager.shared.validateQR(qrCode: code) { [weak self] ticket, error in
             DispatchQueue.main.async {
                 if let ticket = ticket {
-                    let alert = UIAlertController(title: "Valid Ticket", message: "Event: \(ticket.event.name)\nEmail: \(ticket.userEmail ?? "")\nTap to mark used", preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: "Mark Used", style: .default) { _ in
-                        // Вызов mark-as-used API
+                    // Валиден — покажи алерт
+                    let alert = UIAlertController(title: "Билет валиден", message: "Event: \(ticket.event.name)\nEmail: \(ticket.userEmail ?? "—")", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "Отметить использованным", style: .destructive) { _ in
+                        // Вызов mark-as-used 
                     })
-                    alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { _ in
+                    alert.addAction(UIAlertAction(title: "Отмена", style: .cancel) { _ in
                         self?.captureSession.startRunning()
                     })
                     self?.present(alert, animated: true)
                 } else {
-                    // Invalid alert
-                    self?.captureSession.startRunning()
+                    let alert = UIAlertController(title: "Ошибка", message: error?.localizedDescription ?? "Невалидный QR", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+                        self?.captureSession.startRunning()
+                    })
+                    self?.present(alert, animated: true)
                 }
             }
         }

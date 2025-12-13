@@ -4,13 +4,12 @@ struct Event: Codable {
     let id: Int
     let name: String
     let description: String
-    let date: String  // ISO format
+    let location: String
+    let date: String
+    let organizer: String?
     let price: String
     let isFree: Bool
+    let category: String  // ярмарки, семинары и т.д.
     let ticketsAvailable: Int
     let mediaUrls: [String]?
-    
-    enum CodingKeys: String, CodingKey {
-        case id, name, description, date, price, isFree = "is_free", ticketsAvailable = "tickets_available", mediaUrls = "media_urls"
-    }
 }

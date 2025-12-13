@@ -1,19 +1,36 @@
-import SwiftQRCode  // Импорт библиотеки (после добавления через SPM)
+import Foundation
+import UIKit
 
-private func generateQRCode(from string: String) -> Data? {
-    // Базовая генерация (только QR с текстом)
-    guard let qrImage = QRCode.generateImage(string, avatarImage: nil, avatarScale: 0.0) else {
-        return nil
+struct Ticket: Codable {
+    let id: Int
+    let userEmail: String?
+    let event: Event
+    let qrcode: String
+    let paymentStatus: String
+    let used: Bool
+    let createdAt: String
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case userEmail = "user_email" 
+        case event
+        case qrcode
+        case paymentStatus = "payment_status"
+        case used
+        case createdAt = "created_at"
     }
     
-    // Или с параметрами размера (библиотека сама масштабирует, но можно контролировать через UIGraphics)
-    // Если хочешь точный размер:
-    let size = CGSize(width: 300, height: 300)  // Желаемый размер QR
-    UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
-    qrImage.draw(in: CGRect(origin: .zero, size: size))
-    let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
-    UIGraphicsEndImageContext()
-    
-    return resizedImage?.jpegData(compressionQuality: 1.0)
+    // QR-код генерация (native)
+    var qrCodeImage: UIImage? {
+        guard let data = qrcode.data(using: .utf8) else { return nil }
+        guard let filter = CIFilter(name: "CIQRCodeGenerator") else { return nil }
+        filter.setValue(data, forKey: "inputMessage")
+        filter.setValue("H", forKey: "inputCorrectionLevel")
+        guard let ciImage = filter.outputImage else { return nil }
+        let scale = CGFloat(10)
+        let transformed = ciImage.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+        let context = CIContext()
+        guard let cgImage = context.createCGImage(transformed, from: transformed.extent) else { return nil }
+        return UIImage(cgImage: cgImage)
+    }
 }
-//

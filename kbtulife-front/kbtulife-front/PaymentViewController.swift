@@ -37,12 +37,18 @@ class PaymentViewController: UIViewController {
     
     @objc private func markPaid() {
         NetworkManager.shared.markAsPending(ticketId: ticket.id) { [weak self] message, error in
-            if message != nil {
-                let alert = UIAlertController(title: "Готово!", message: "Ожидаем проверки админом", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .default))
-                self?.present(alert, animated: true)
-                // Вернись к My Tickets
-                self?.navigationController?.popToRootViewController(animated: true)
+            DispatchQueue.main.async {
+                if let message = message {
+                    let alert = UIAlertController(title: "Успех", message: message, preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+                        self?.navigationController?.popToRootViewController(animated: true)
+                    })
+                    self?.present(alert, animated: true)
+                } else {
+                    let alert = UIAlertController(title: "Ошибка", message: error?.localizedDescription ?? "Неизвестная ошибка", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .default))
+                    self?.present(alert, animated: true)
+                }
             }
         }
     }

@@ -216,7 +216,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				DA18FA302EEC422300ECB782 /* XCRemoteSwiftPackageReference "Alamofire" */,
-				DA18FA332EEC43FC00ECB782 /* XCRemoteSwiftPackageReference "SwiftQRCode" */,
+				DAA5E9042EED804500DCFFCE /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DA18F9FD2EEC3E7000ECB782 /* Products */;
@@ -583,12 +583,12 @@
 				minimumVersion = 5.10.2;
 			};
 		};
-		DA18FA332EEC43FC00ECB782 /* XCRemoteSwiftPackageReference "SwiftQRCode" */ = {
+		DAA5E9042EED804500DCFFCE /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/liufan321/SwiftQRCode";
+			repositoryURL = "https://github.com/onevcat/Kingfisher";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 3.0.2;
+				minimumVersion = 8.6.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

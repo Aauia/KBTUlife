@@ -2,6 +2,7 @@ import UIKit
 
 class EventDetailViewController: UIViewController {
     private let event: Event
+    
     private let buyButton = UIButton(type: .system)
     
     init(event: Event) {
@@ -18,29 +19,49 @@ class EventDetailViewController: UIViewController {
         title = event.name
         view.backgroundColor = .systemBackground
         
-        // Добавь UILabel для description, UIImageView для mediaUrls[0]
-        let descLabel = UILabel()
-        descLabel.text = event.description
-        descLabel.numberOfLines = 0
-        view.addSubview(descLabel)
-        // Constraints...
         
-        buyButton.setTitle("Buy Ticket (\(event.ticketsAvailable) left)", for: .normal)
-        buyButton.backgroundColor = .systemGreen
-        buyButton.layer.cornerRadius = 10
-        buyButton.addTarget(self, action: #selector(buyTicket), for: .touchUpInside)
-        view.addSubview(buyButton)
-        // Constraints: buyButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20)
+        buyButton.setTitle("Купить билет", for: .normal)
+        buyButton.backgroundColor = .systemBlue
+        buyButton.setTitleColor(.white, for: .normal)
+        buyButton.layer.cornerRadius = 12
+        buyButton.addTarget(self, action: #selector(buyTicketTapped), for: .touchUpInside)
+        
     }
     
-    @objc private func buyTicket() {
+    private func configureBuyButton() {
+        if event.ticketsAvailable <= 0 {
+            buyButton.setTitle("Билеты закончились", for: .normal)
+            buyButton.isEnabled = false
+            buyButton.backgroundColor = .systemGray
+        } else {
+            buyButton.setTitle("Купить билет (\(event.ticketsAvailable) осталось)", for: .normal)
+            buyButton.isEnabled = true
+        }
+    }
+    
+    @objc private func buyTicketTapped() {
+        guard event.ticketsAvailable > 0 else {
+            showAlert(title: "Ошибка", message: "Билеты закончились")
+            return
+        }
+        
         NetworkManager.shared.buyTicket(eventId: event.id) { [weak self] ticket, error in
-            if let ticket = ticket {
-                let paymentVC = PaymentViewController(ticket: ticket)
-                self?.navigationController?.pushViewController(paymentVC, animated: true)
-            } else {
-                // Alert error
+            DispatchQueue.main.async {
+                if let ticket = ticket {
+                    // Успешно куплен — переходим на экран оплаты Kaspi
+                    let paymentVC = PaymentViewController(ticket: ticket)
+                    self?.navigationController?.pushViewController(paymentVC, animated: true)
+                } else {
+                    let errorMessage = error?.localizedDescription ?? "Неизвестная ошибка при покупке"
+                    self?.showAlert(title: "Ошибка покупки", message: errorMessage)
+                }
             }
         }
+    }
+    
+    private func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
 }

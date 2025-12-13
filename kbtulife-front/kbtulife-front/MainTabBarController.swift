@@ -4,29 +4,27 @@ class MainTabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Табы: Home, Events, Tickets, Profile
-        let homeVC = UIViewController()  // Замени на HomeViewController
-        homeVC.tabBarItem = UITabBarItem(title: "Home", image: UIImage(systemName: "house"), tag: 0)
+        let newsNav = UINavigationController(rootViewController: NewsViewController())
+        newsNav.tabBarItem = UITabBarItem(title: "Home", image: UIImage(systemName: "house"), tag: 0)
         
-        let eventsNC = UINavigationController(rootViewController: EventsViewController())
-        eventsNC.tabBarItem = UITabBarItem(title: "Events", image: UIImage(systemName: "calendar"), tag: 1)
+        let eventsNav = UINavigationController(rootViewController: EventsViewController())
+        eventsNav.tabBarItem = UITabBarItem(title: "Events", image: UIImage(systemName: "calendar"), tag: 1)
         
-        let ticketsNC = UINavigationController(rootViewController: MyTicketsViewController())
-        ticketsNC.tabBarItem = UITabBarItem(title: "Tickets", image: UIImage(systemName: "ticket"), tag: 2)
+        let clubsNav = UINavigationController(rootViewController: ClubsViewController())
+        clubsNav.tabBarItem = UITabBarItem(title: "Clubs", image: UIImage(systemName: "person.3"), tag: 2)
         
-        let profileVC = UIViewController()  // ProfileViewController
-        profileVC.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(systemName: "person"), tag: 3)
+        let ticketsNav = UINavigationController(rootViewController: MyTicketsViewController())
+        ticketsNav.tabBarItem = UITabBarItem(title: "Tickets", image: UIImage(systemName: "ticket"), tag: 3)
         
-        // Manager Tab (скрытый, для роли менеджера)
-        if UserDefaults.standard.bool(forKey: "isManager") {  // Логика ролей
-            let scannerNC = UINavigationController(rootViewController: QRScannerViewController())
-            scannerNC.tabBarItem = UITabBarItem(title: "Scanner", image: UIImage(systemName: "qrcode.viewfinder"), tag: 4)
-            viewControllers = [homeVC, eventsNC, ticketsNC, profileVC, scannerNC]
-        } else {
-            viewControllers = [homeVC, eventsNC, ticketsNC, profileVC]
+        let profileNav = UINavigationController(rootViewController: ProfileViewController())
+        profileNav.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(systemName: "person"), tag: 4)
+        
+        viewControllers = [newsNav, eventsNav, clubsNav, ticketsNav, profileNav]
+        
+        if UserDefaults.standard.bool(forKey: "isStaff") {
+            let adminNav = UINavigationController(rootViewController: AdminDashboardViewController())
+            adminNav.tabBarItem = UITabBarItem(title: "Admin", image: UIImage(systemName: "shield"), tag: 5)
+            viewControllers?.append(adminNav)
         }
-        
-        tabBar.tintColor = .systemBlue
-        tabBar.barTintColor = .systemBackground
     }
 }
