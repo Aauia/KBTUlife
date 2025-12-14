@@ -1,30 +1,58 @@
+// LoginViewController.swift
 import UIKit
 
 class LoginViewController: UIViewController {
     private let outlookTextField = UITextField()
     private let passwordTextField = UITextField()
     private let loginButton = UIButton(type: .system)
+    private let activityIndicator = UIActivityIndicatorView(style: .medium)
+    private let registerButton = UIButton(type: .system)  // ✅ Added
     
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Вход"
         view.backgroundColor = .systemBackground
         
+        setupUI()
+    }
+    
+    private func setupUI() {
+        // Outlook TextField
         outlookTextField.placeholder = "Outlook email (@kbtu.kz)"
         outlookTextField.keyboardType = .emailAddress
+        outlookTextField.autocapitalizationType = .none
         outlookTextField.borderStyle = .roundedRect
         
+        // Password TextField
         passwordTextField.placeholder = "Пароль"
         passwordTextField.isSecureTextEntry = true
         passwordTextField.borderStyle = .roundedRect
         
+        // Login Button
         loginButton.setTitle("Войти", for: .normal)
         loginButton.backgroundColor = .systemBlue
         loginButton.setTitleColor(.white, for: .normal)
         loginButton.layer.cornerRadius = 12
+        loginButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
         loginButton.addTarget(self, action: #selector(loginTapped), for: .touchUpInside)
         
-        let stack = UIStackView(arrangedSubviews: [outlookTextField, passwordTextField, loginButton])
+        // Activity Indicator
+        activityIndicator.hidesWhenStopped = true
+        
+        // Register Button ✅
+        registerButton.setTitle("Нет аккаунта? Зарегистрироваться", for: .normal)
+        registerButton.titleLabel?.font = .systemFont(ofSize: 15)
+        registerButton.setTitleColor(.systemBlue, for: .normal)
+        registerButton.addTarget(self, action: #selector(registerTapped), for: .touchUpInside)
+        
+        // Stack View - Added registerButton ✅
+        let stack = UIStackView(arrangedSubviews: [
+            outlookTextField,
+            passwordTextField,
+            loginButton,
+            activityIndicator,
+            registerButton  // ✅ Added to stack
+        ])
         stack.axis = .vertical
         stack.spacing = 20
         stack.alignment = .fill
@@ -43,24 +71,31 @@ class LoginViewController: UIViewController {
     }
     
     @objc private func loginTapped() {
-        guard let outlook = outlookTextField.text, !outlook.isEmpty,
+        guard let outlook = outlookTextField.text?.trimmingCharacters(in: .whitespaces), !outlook.isEmpty,
               let password = passwordTextField.text, !password.isEmpty else {
             showAlert(title: "Ошибка", message: "Заполните все поля")
             return
         }
         
         loginButton.isEnabled = false
-        loginButton.setTitle("Вход...", for: .normal)
+        loginButton.setTitle("", for: .normal)
+        activityIndicator.startAnimating()
         
-        NetworkManager.shared.login(outlook: outlook, password: password) { [weak self] success, error in
+        NetworkManager.shared.login(outlook: outlook, password: password) { [weak self] user, error in
             DispatchQueue.main.async {
                 self?.loginButton.isEnabled = true
                 self?.loginButton.setTitle("Войти", for: .normal)
+                self?.activityIndicator.stopAnimating()
                 
-                if success {
+                if let user = user {
+                    print("✅ Logged in: \(user.firstName) \(user.lastName)")
+                    
+                    // Navigate to main app
                     let mainTab = MainTabBarController()
-                    UIApplication.shared.windows.first?.rootViewController = mainTab
-                    UIApplication.shared.windows.first?.makeKeyAndVisible()
+                    if let window = UIApplication.shared.windows.first {
+                        window.rootViewController = mainTab
+                        window.makeKeyAndVisible()
+                    }
                 } else {
                     let message = error?.localizedDescription ?? "Неверный email или пароль"
                     self?.showAlert(title: "Ошибка входа", message: message)
@@ -69,9 +104,16 @@ class LoginViewController: UIViewController {
         }
     }
     
+    // ✅ New method for registration
+    @objc private func registerTapped() {
+        let registerVC = RegistrationViewController()
+        navigationController?.pushViewController(registerVC, animated: true)
+    }
+    
     private func showAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }
 }
+

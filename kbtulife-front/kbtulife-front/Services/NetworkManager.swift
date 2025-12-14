@@ -1,3 +1,4 @@
+// NetworkManager.swift
 import Alamofire
 import Foundation
 
@@ -5,18 +6,143 @@ class NetworkManager {
     static let shared = NetworkManager()
     private let baseURL = "http://localhost:8000/"
     
+    // Session manager with cookie storage
+    private lazy var session: Session = {
+        let configuration = URLSessionConfiguration.af.default
+        configuration.httpCookieStorage = HTTPCookieStorage.shared
+        configuration.httpShouldSetCookies = true
+        configuration.httpCookieAcceptPolicy = .always
+        return Session(configuration: configuration)
+    }()
+    
     private var headers: HTTPHeaders {
         var h = HTTPHeaders()
-        if let token = UserDefaults.standard.string(forKey: "authToken") {
-            h["Authorization"] = "Token \(token)"
+        h["Content-Type"] = "application/json"
+        
+        // Add session ID if available
+        if let sessionId = UserDefaults.standard.string(forKey: "sessionid") {
+            h["Cookie"] = "sessionid=\(sessionId)"
         }
         return h
     }
     
-    // Generic GET method
+    // MARK: - Authentication
+    
+    func login(outlook: String, password: String, completion: @escaping (User?, Error?) -> Void) {
+        let url = baseURL + "api/login/"
+        let parameters: [String: Any] = [
+            "outlook": outlook,
+            "password": password
+        ]
+        
+        session.request(url, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+            .responseDecodable(of: LoginResponse.self) { response in
+                switch response.result {
+                case .success(let loginResponse):
+                    // Save session ID
+                    UserDefaults.standard.set(loginResponse.sessionid, forKey: "sessionid")
+                    UserDefaults.standard.set(true, forKey: "isLoggedIn")
+                    
+                    // Save cookies
+                    if let cookies = HTTPCookieStorage.shared.cookies {
+                        let cookieData = try? NSKeyedArchiver.archivedData(withRootObject: cookies, requiringSecureCoding: false)
+                        UserDefaults.standard.set(cookieData, forKey: "cookies")
+                    }
+                    
+                    completion(loginResponse.user, nil)
+                    
+                case .failure(let error):
+                    print("Login error: \(error)")
+                    completion(nil, error)
+                }
+            }
+    }
+    
+    func register(outlook: String, firstName: String, lastName: String, phone: String?, password: String, completion: @escaping (User?, Error?) -> Void) {
+        let url = baseURL + "api/register/"
+        var parameters: [String: Any] = [
+            "outlook": outlook,
+            "first_name": firstName,
+            "last_name": lastName,
+            "password": password
+        ]
+        
+        // Add phone if provided
+        if let phone = phone, !phone.isEmpty {
+            parameters["phone"] = phone
+        }
+        
+        session.request(url, method: .post, parameters: parameters, encoding: JSONEncoding.default)
+            .responseDecodable(of: RegisterResponse.self) { response in
+                switch response.result {
+                case .success(let registerResponse):
+                    // Check if sessionid is in response
+                    if let sessionData = try? JSONSerialization.jsonObject(with: response.data ?? Data()) as? [String: Any],
+                       let sessionId = sessionData["sessionid"] as? String {
+                        UserDefaults.standard.set(sessionId, forKey: "sessionid")
+                    }
+                    
+                    // Mark as logged in
+                    UserDefaults.standard.set(true, forKey: "isLoggedIn")
+                    
+                    // Save cookies
+                    if let cookies = HTTPCookieStorage.shared.cookies {
+                        let cookieData = try? NSKeyedArchiver.archivedData(withRootObject: cookies, requiringSecureCoding: false)
+                        UserDefaults.standard.set(cookieData, forKey: "cookies")
+                    }
+                    
+                    completion(registerResponse.user, nil)
+                    
+                case .failure(let error):
+                    print("Registration error: \(error)")
+                    completion(nil, error)
+                }
+            }
+    }
+    
+    func logout(completion: @escaping (Bool, Error?) -> Void) {
+        let url = baseURL + "api/logout/"
+
+        session.request(url, method: .post, headers: headers)
+            .validate(statusCode: 200..<300) // only treat 2xx as success
+            .response { response in
+                switch response.result {
+                case .success:
+                    // Clear local session and cookies
+                    UserDefaults.standard.removeObject(forKey: "sessionid")
+                    UserDefaults.standard.removeObject(forKey: "isLoggedIn")
+                    UserDefaults.standard.removeObject(forKey: "cookies")
+                    
+                    HTTPCookieStorage.shared.cookies?.forEach { HTTPCookieStorage.shared.deleteCookie($0) }
+
+                    completion(true, nil)
+                case .failure(let error):
+                    print("Logout failed:", error)
+                    completion(false, error)
+                }
+            }
+    }
+
+    
+    func fetchCurrentUser(completion: @escaping (User?, Error?) -> Void) {
+        let url = baseURL + "api/me/"
+        
+        session.request(url, headers: headers)
+            .responseDecodable(of: User.self) { response in
+                switch response.result {
+                case .success(let user):
+                    completion(user, nil)
+                case .failure(let error):
+                    completion(nil, error)
+                }
+            }
+    }
+    
+    // MARK: - Generic Methods
+    
     func get<T: Decodable>(url: String, completion: @escaping (T?, Error?) -> Void) {
         let fullURL = baseURL + url
-        AF.request(fullURL, headers: headers).responseDecodable(of: T.self) { response in
+        session.request(fullURL, headers: headers).responseDecodable(of: T.self) { response in
             switch response.result {
             case .success(let value):
                 completion(value, nil)
@@ -26,10 +152,9 @@ class NetworkManager {
         }
     }
     
-    // POST method (для покупки билета, login и т.д.)
     func post<T: Decodable>(url: String, parameters: [String: Any], completion: @escaping (T?, Error?) -> Void) {
         let fullURL = baseURL + url
-        AF.request(fullURL, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+        session.request(fullURL, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
             .responseDecodable(of: T.self) { response in
                 switch response.result {
                 case .success(let value):
@@ -40,41 +165,43 @@ class NetworkManager {
             }
     }
     
-    func markAsPending(ticketId: Int, completion: @escaping (String?, Error?) -> Void) {
-        let url = "tickets/\(ticketId)/mark-as-pending/"
-        AF.request(baseURL + url, method: .post, headers: headers).responseString { response in
-            switch response.result {
-            case .success(let message):
-                completion(message, nil)
-            case .failure(let error):
-                completion(nil, error)
-            }
+    // MARK: - Events
+    
+    func fetchEvents(filters: [String: String] = [:], completion: @escaping ([Event]?, Error?) -> Void) {
+        var url = "events/"
+        if !filters.isEmpty {
+            let query = filters.map { "\($0.key)=\($0.value)" }.joined(separator: "&")
+            url += "?\(query)"
         }
+        get(url: url, completion: completion)
     }
-    func validateQR(qrCode: String, completion: @escaping (Ticket?, Error?) -> Void) {
-        let url = "tickets/validate-qr/"
-        let params = ["qr_code": qrCode]
-        AF.request(baseURL + url, method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
-            .responseDecodable(of: ValidateQRResponse.self) { response in
-                switch response.result {
-                case .success(let resp):
-                    completion(resp.ticket, nil)
-                case .failure(let error):
-                    completion(nil, error)
-                }
-            }
+    
+    func fetchEventDetail(id: Int, completion: @escaping (Event?, Error?) -> Void) {
+        let url = "events/\(id)/"
+        get(url: url, completion: completion)
     }
-    struct ValidateQRResponse: Codable {
-        let status: String
-        let ticket: Ticket?
-        let message: String?
+    
+    // MARK: - News
+    
+    func fetchNews(completion: @escaping ([News]?, Error?) -> Void) {
+        get(url: "news/", completion: completion)
     }
-    // Покупка билета на событие
+    
+    func fetchNewsDetail(id: Int, completion: @escaping (News?, Error?) -> Void) {
+        let url = "news/\(id)/"
+        get(url: url, completion: completion)
+    }
+    
+    // MARK: - Tickets
+    
+    func fetchMyTickets(completion: @escaping ([Ticket]?, Error?) -> Void) {
+        get(url: "tickets/", completion: completion)
+    }
+    
     func buyTicket(eventId: Int, completion: @escaping (Ticket?, Error?) -> Void) {
         let url = "tickets/"
         let parameters: [String: Any] = ["event_id": eventId]
-        
-        AF.request(baseURL + url, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+        session.request(baseURL + url, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
             .responseDecodable(of: Ticket.self) { response in
                 switch response.result {
                 case .success(let ticket):
@@ -84,38 +211,80 @@ class NetworkManager {
                 }
             }
     }
-    // Загрузка событий (с фильтрами)
-    func fetchEvents(filters: [String: String] = [:], completion: @escaping ([Event]?, Error?) -> Void) {
-        var url = "events/"
-        if !filters.isEmpty {
-            let query = filters.map { "\($0.key)=\($0.value)" }.joined(separator: "&")
-            url += "?\(query)"
-        }
-        
-        AF.request(baseURL + url, headers: headers).responseDecodable(of: [Event].self) { response in
+    
+    func markAsPending(ticketId: Int, completion: @escaping (String?, Error?) -> Void) {
+        let url = "tickets/\(ticketId)/mark-as-pending/"
+        session.request(baseURL + url, method: .post, headers: headers).responseString { response in
             switch response.result {
-            case .success(let events):
-                completion(events, nil)
+            case .success(let message):
+                completion(message, nil)
             case .failure(let error):
                 completion(nil, error)
             }
         }
     }
-    func login(outlook: String, password: String, completion: @escaping (Bool, Error?) -> Void) {
-        // Заглушка — всегда успех
-        UserDefaults.standard.set("fake_token", forKey: "authToken")
-        completion(true, nil)
-    }
-    // Загрузка моих билетов
-    func fetchMyTickets(completion: @escaping ([Ticket]?, Error?) -> Void) {
-        let url = "tickets/"
-        AF.request(baseURL + url, headers: headers).responseDecodable(of: [Ticket].self) { response in
-            switch response.result {
-            case .success(let tickets):
-                completion(tickets, nil)
-            case .failure(let error):
-                completion(nil, error)
+    
+    func validateQR(qrCode: String, completion: @escaping (Ticket?, Error?) -> Void) {
+        let url = "tickets/validate-qr/"
+        let params = ["qr_code": qrCode]
+        session.request(baseURL + url, method: .post, parameters: params, encoding: JSONEncoding.default, headers: headers)
+            .responseDecodable(of: ValidateQRResponse.self) { response in
+                switch response.result {
+                case .success(let resp):
+                    completion(resp.ticket, nil)
+                case .failure(let error):
+                    completion(nil, error)
+                }
             }
+    }
+    
+    // MARK: - Clubs
+    // MARK: - Clubs (Add to your existing NetworkManager)
+
+    func fetchClubs(completion: @escaping ([Club]?, Error?) -> Void) {
+        get(url: "clubs/", completion: completion)
+    }
+
+    func fetchClubDetail(id: Int, completion: @escaping (Club?, Error?) -> Void) {
+        let url = "clubs/\(id)/"
+        get(url: url, completion: completion)
+    }
+
+    func fetchClubMembers(clubId: Int, completion: @escaping ([ClubMember]?, Error?) -> Void) {
+        let url = "clubs/\(clubId)/members/"
+        get(url: url, completion: completion)
+    }
+
+    func fetchUserClubs(userId: String, completion: @escaping ([Club]?, Error?) -> Void) {
+        let url = "users/\(userId)/clubs/"
+        get(url: url, completion: completion)
+    }
+
+    func applyToClub(clubId: Int, completion: @escaping (Membership?, Error?) -> Void) {
+        let url = "membership/apply/"
+        let parameters: [String: Any] = ["club": clubId]
+        post(url: url, parameters: parameters, completion: completion)
+    }
+
+    func createClub(name: String, description: String, instagramLink: String?, telegramLink: String?, completion: @escaping (Club?, Error?) -> Void) {
+        let url = "clubs/create/"
+        var parameters: [String: Any] = [
+            "name": name,
+            "description": description
+        ]
+        if let instagram = instagramLink, !instagram.isEmpty {
+            parameters["instagram_link"] = instagram
         }
+        if let telegram = telegramLink, !telegram.isEmpty {
+            parameters["telegram_link"] = telegram
+        }
+        post(url: url, parameters: parameters, completion: completion)
+    }
+    // MARK: - Supporting Structs
+    
+    struct ValidateQRResponse: Codable {
+        let status: String
+        let ticket: Ticket?
+        let message: String?
     }
 }

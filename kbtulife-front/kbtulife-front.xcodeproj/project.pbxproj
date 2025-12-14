@@ -39,6 +39,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				ViewContrrollers/Untitled.swift,
 			);
 			target = DA18F9FB2EEC3E7000ECB782 /* kbtulife-front */;
 		};

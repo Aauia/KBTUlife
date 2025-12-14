@@ -1,3 +1,4 @@
+// SceneDelegate.swift
 import UIKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
@@ -8,9 +9,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let window = UIWindow(windowScene: windowScene)
         
-        if UserDefaults.standard.string(forKey: "authToken") != nil {
-            window.rootViewController = OnboardingViewController()
+        // Check if user is logged in
+        let isLoggedIn = UserDefaults.standard.bool(forKey: "isLoggedIn")
+        
+        if isLoggedIn {
+            // User is logged in - go to main app
+            window.rootViewController = MainTabBarController()
         } else {
+            // Not logged in - show onboarding/login
             let authNav = UINavigationController(rootViewController: OnboardingViewController())
             window.rootViewController = authNav
         }
