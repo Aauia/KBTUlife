@@ -1,5 +1,4 @@
 import UIKit
-import SDWebImage
 
 class NewsDetailViewController: UIViewController {
     private let news: NewsItem
@@ -80,6 +79,6 @@ class NewsDetailViewController: UIViewController {
     private func configure() {
         titleLabel.text = news.title
         contentLabel.text = news.content
-        imageView.sd_setImage(with: URL(string: news.imageUrl ?? ""), placeholderImage: UIImage(systemName: "photo"))
+        imageView.sd_setImage(with: URL(string: news.mediaUrl ?? ""), placeholderImage: UIImage(systemName: "photo"))
     }
 }

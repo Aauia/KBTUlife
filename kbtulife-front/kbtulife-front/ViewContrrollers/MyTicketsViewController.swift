@@ -1,52 +1,67 @@
 import UIKit
 
 class MyTicketsViewController: UIViewController {
-    private let tableView = UITableView()
+    
+    @IBOutlet weak var tableView: UITableView!
+    
     private var tickets: [Ticket] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "My Tickets"
-        view.backgroundColor = .systemBackground
-        
-        tableView.dataSource = self
-        tableView.delegate = self
-        tableView.register(TicketCell.self, forCellReuseIdentifier: "TicketCell")
-        view.addSubview(tableView)
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
-        
+        setupTableView()
         fetchTickets()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        fetchTickets() // обновляем при каждом появлении
+    }
+    
+    private func setupTableView() {
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.register(TicketCell.self, forCellReuseIdentifier: "TicketCell")
+        // или UINib если из xib/storyboard
+    }
+    
     private func fetchTickets() {
-        NetworkManager.shared.fetchMyTickets { [weak self] tickets, error in
+        NetworkManager.shared.get(url: "tickets/") { [weak self] (tickets: [Ticket]?, error: Error?) in
             DispatchQueue.main.async {
                 if let tickets = tickets {
                     self?.tickets = tickets
                     self?.tableView.reloadData()
+                    print("Загружено билетов: \(tickets.count)")
                 } else {
-                    print("Error fetching tickets: \(error?.localizedDescription ?? "Unknown")")
-                    // Можно добавить алерт
+                    print("Ошибка загрузки билетов: \(error?.localizedDescription ?? "Unknown error")")
+                    self?.showErrorAlert(message: error?.localizedDescription ?? "Не удалось загрузить билеты")
                 }
             }
         }
     }
+    
+    private func showErrorAlert(message: String) {
+        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
 }
 
-extension MyTicketsViewController: UITableViewDataSource, UITableViewDelegate {
+// MARK: - UITableViewDataSource
+extension MyTicketsViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        tickets.count
+        return tickets.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TicketCell", for: indexPath) as! TicketCell
         cell.configure(with: tickets[indexPath.row])
         return cell
+    }
+}
+
+extension MyTicketsViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        // можно открыть деталку билета или QR-код
     }
 }

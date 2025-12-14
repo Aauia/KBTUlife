@@ -28,6 +28,7 @@ class NetworkManager {
     
     // MARK: - Authentication
     
+    // ✅ FIXED: Better error handling for login
     func login(outlook: String, password: String, completion: @escaping (User?, Error?) -> Void) {
         let url = baseURL + "api/login/"
         let parameters: [String: Any] = [
@@ -36,28 +37,53 @@ class NetworkManager {
         ]
         
         session.request(url, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
-            .responseDecodable(of: LoginResponse.self) { response in
+            .validate() // Validate status code
+            .responseData { response in
                 switch response.result {
-                case .success(let loginResponse):
-                    // Save session ID
-                    UserDefaults.standard.set(loginResponse.sessionid, forKey: "sessionid")
-                    UserDefaults.standard.set(true, forKey: "isLoggedIn")
-                    
-                    // Save cookies
-                    if let cookies = HTTPCookieStorage.shared.cookies {
-                        let cookieData = try? NSKeyedArchiver.archivedData(withRootObject: cookies, requiringSecureCoding: false)
-                        UserDefaults.standard.set(cookieData, forKey: "cookies")
+                case .success(let data):
+                    // Try to decode as LoginResponse
+                    if let loginResponse = try? JSONDecoder().decode(LoginResponse.self, from: data),
+                       let user = loginResponse.user,
+                       let sessionid = loginResponse.sessionid {
+                        
+                        // Save session ID
+                        UserDefaults.standard.set(sessionid, forKey: "sessionid")
+                        UserDefaults.standard.set(true, forKey: "isLoggedIn")
+                        
+                        // Save cookies
+                        if let cookies = HTTPCookieStorage.shared.cookies {
+                            let cookieData = try? NSKeyedArchiver.archivedData(withRootObject: cookies, requiringSecureCoding: false)
+                            UserDefaults.standard.set(cookieData, forKey: "cookies")
+                        }
+                        
+                        completion(user, nil)
+                    } else {
+                        // Try to decode error
+                        if let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data) {
+                            let error = NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: errorResponse.firstError])
+                            completion(nil, error)
+                        } else {
+                            let error = NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response format"])
+                            completion(nil, error)
+                        }
                     }
-                    
-                    completion(loginResponse.user, nil)
                     
                 case .failure(let error):
                     print("Login error: \(error)")
-                    completion(nil, error)
+                    
+                    // Try to extract error message from response data
+                    if let data = response.data,
+                       let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data) {
+                        let customError = NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: errorResponse.firstError])
+                        completion(nil, customError)
+                    } else {
+                        completion(nil, error)
+                    }
                 }
             }
     }
     
+    // ✅ FIXED: Better error handling for registration
     func register(outlook: String, firstName: String, lastName: String, phone: String?, password: String, completion: @escaping (User?, Error?) -> Void) {
         let url = baseURL + "api/register/"
         var parameters: [String: Any] = [
@@ -72,30 +98,52 @@ class NetworkManager {
             parameters["phone"] = phone
         }
         
-        session.request(url, method: .post, parameters: parameters, encoding: JSONEncoding.default)
-            .responseDecodable(of: RegisterResponse.self) { response in
+        session.request(url, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+            .validate()
+            .responseData { response in
                 switch response.result {
-                case .success(let registerResponse):
-                    // Check if sessionid is in response
-                    if let sessionData = try? JSONSerialization.jsonObject(with: response.data ?? Data()) as? [String: Any],
-                       let sessionId = sessionData["sessionid"] as? String {
-                        UserDefaults.standard.set(sessionId, forKey: "sessionid")
+                case .success(let data):
+                    // Try to decode as RegisterResponse
+                    if let registerResponse = try? JSONDecoder().decode(RegisterResponse.self, from: data),
+                       let user = registerResponse.user {
+                        
+                        // Save session ID if available
+                        if let sessionid = registerResponse.sessionid {
+                            UserDefaults.standard.set(sessionid, forKey: "sessionid")
+                        }
+                        
+                        // Mark as logged in
+                        UserDefaults.standard.set(true, forKey: "isLoggedIn")
+                        
+                        // Save cookies
+                        if let cookies = HTTPCookieStorage.shared.cookies {
+                            let cookieData = try? NSKeyedArchiver.archivedData(withRootObject: cookies, requiringSecureCoding: false)
+                            UserDefaults.standard.set(cookieData, forKey: "cookies")
+                        }
+                        
+                        completion(user, nil)
+                    } else {
+                        // Try to decode error
+                        if let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data) {
+                            let error = NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: errorResponse.firstError])
+                            completion(nil, error)
+                        } else {
+                            let error = NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response format"])
+                            completion(nil, error)
+                        }
                     }
-                    
-                    // Mark as logged in
-                    UserDefaults.standard.set(true, forKey: "isLoggedIn")
-                    
-                    // Save cookies
-                    if let cookies = HTTPCookieStorage.shared.cookies {
-                        let cookieData = try? NSKeyedArchiver.archivedData(withRootObject: cookies, requiringSecureCoding: false)
-                        UserDefaults.standard.set(cookieData, forKey: "cookies")
-                    }
-                    
-                    completion(registerResponse.user, nil)
                     
                 case .failure(let error):
                     print("Registration error: \(error)")
-                    completion(nil, error)
+                    
+                    // Try to extract error message from response data
+                    if let data = response.data,
+                       let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data) {
+                        let customError = NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: errorResponse.firstError])
+                        completion(nil, customError)
+                    } else {
+                        completion(nil, error)
+                    }
                 }
             }
     }
@@ -104,7 +152,7 @@ class NetworkManager {
         let url = baseURL + "api/logout/"
 
         session.request(url, method: .post, headers: headers)
-            .validate(statusCode: 200..<300) // only treat 2xx as success
+            .validate(statusCode: 200..<300)
             .response { response in
                 switch response.result {
                 case .success:
@@ -239,17 +287,16 @@ class NetworkManager {
     }
     
     // MARK: - Clubs
-    // MARK: - Clubs (Add to your existing NetworkManager)
-
+    
     func fetchClubs(completion: @escaping ([Club]?, Error?) -> Void) {
         get(url: "clubs/", completion: completion)
     }
 
-    func fetchClubDetail(id: Int, completion: @escaping (Club?, Error?) -> Void) {
+    func fetchClubDetail(_ id: Int, completion: @escaping (Club?, Error?) -> Void) {
         let url = "clubs/\(id)/"
         get(url: url, completion: completion)
     }
-
+    
     func fetchClubMembers(clubId: Int, completion: @escaping ([ClubMember]?, Error?) -> Void) {
         let url = "clubs/\(clubId)/members/"
         get(url: url, completion: completion)
@@ -280,6 +327,7 @@ class NetworkManager {
         }
         post(url: url, parameters: parameters, completion: completion)
     }
+    
     // MARK: - Supporting Structs
     
     struct ValidateQRResponse: Codable {

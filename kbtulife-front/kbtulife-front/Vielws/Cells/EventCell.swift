@@ -1,11 +1,13 @@
 import UIKit
 
 class EventCell: UITableViewCell {
-    private let titleLabel = UILabel()
-    private let dateLabel = UILabel()
-    private let priceLabel = UILabel()
     private let thumbnailImageView = UIImageView()
-    private let buyButton = UIButton(type: .system)
+    private let titleLabel = UILabel()
+    private let organizerLabel = UILabel()
+    private let dateTimeLabel = UILabel()
+    private let locationLabel = UILabel()
+    private let priceTag = UILabel()
+    private let ticketsLabel = UILabel()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -17,73 +19,137 @@ class EventCell: UITableViewCell {
     }
     
     private func setupUI() {
-        titleLabel.font = .boldSystemFont(ofSize: 18)
-        titleLabel.numberOfLines = 2
+        backgroundColor = .white
+        layer.cornerRadius = 16
+        layer.shadowOpacity = 0.1
+        layer.shadowOffset = CGSize(width: 0, height: 2)
+        layer.shadowRadius = 8
+        clipsToBounds = false
+        contentView.clipsToBounds = false
         
-        dateLabel.font = .systemFont(ofSize: 14)
-        dateLabel.textColor = .secondaryLabel
-        
-        priceLabel.font = .systemFont(ofSize: 16, weight: .semibold)
-        priceLabel.textColor = .systemGreen
-        
+        // Thumbnail
         thumbnailImageView.contentMode = .scaleAspectFill
         thumbnailImageView.clipsToBounds = true
-        thumbnailImageView.layer.cornerRadius = 8
+        thumbnailImageView.layer.cornerRadius = 12
+        thumbnailImageView.backgroundColor = .systemGray5
         
-        buyButton.setTitle("Купить билет", for: .normal)
-        buyButton.titleLabel?.font = .boldSystemFont(ofSize: 16)
-        buyButton.backgroundColor = .systemBlue
-        buyButton.setTitleColor(.white, for: .normal)
-        buyButton.layer.cornerRadius = 10
+        // Labels
+        titleLabel.font = .systemFont(ofSize: 15, weight: .medium)
+        titleLabel.textColor = .label
+        titleLabel.numberOfLines = 2
         
-        // Добавляем на contentView
+        organizerLabel.font = .systemFont(ofSize: 13)
+        organizerLabel.textColor = .secondaryLabel
+        
+        dateTimeLabel.font = .systemFont(ofSize: 12)
+        dateTimeLabel.textColor = .secondaryLabel
+        
+        locationLabel.font = .systemFont(ofSize: 12)
+        locationLabel.textColor = .secondaryLabel
+        
+        priceTag.font = .systemFont(ofSize: 12, weight: .semibold)
+        priceTag.textColor = .white
+        priceTag.textAlignment = .center
+        priceTag.layer.cornerRadius = 12
+        priceTag.clipsToBounds = true
+        
+        ticketsLabel.font = .systemFont(ofSize: 12)
+        ticketsLabel.textColor = .secondaryLabel
+        
+        // Stacks
+        let infoStack = UIStackView(arrangedSubviews: [titleLabel, organizerLabel, dateTimeLabel, locationLabel])
+        infoStack.axis = .vertical
+        infoStack.spacing = 6
+        
+        let bottomStack = UIStackView(arrangedSubviews: [priceTag, ticketsLabel])
+        bottomStack.axis = .horizontal
+        bottomStack.spacing = 8
+        bottomStack.alignment = .center
+        
+        let mainStack = UIStackView(arrangedSubviews: [infoStack, bottomStack])
+        mainStack.axis = .vertical
+        mainStack.spacing = 16
+        
         contentView.addSubview(thumbnailImageView)
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(dateLabel)
-        contentView.addSubview(priceLabel)
-        contentView.addSubview(buyButton)
+        contentView.addSubview(mainStack)
         
-        // Отключаем autoresizing masks
-        [thumbnailImageView, titleLabel, dateLabel, priceLabel, buyButton].forEach {
+        [thumbnailImageView, mainStack].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
         
-        // Constraints (пример под Figma-стиль: изображение слева, текст справа, кнопка снизу)
         NSLayoutConstraint.activate([
-            thumbnailImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            thumbnailImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
-            thumbnailImageView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -16),
-            thumbnailImageView.widthAnchor.constraint(equalToConstant: 100),
-            thumbnailImageView.heightAnchor.constraint(equalToConstant: 100),
+            thumbnailImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
+            thumbnailImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            thumbnailImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
+            thumbnailImageView.widthAnchor.constraint(equalToConstant: 96),
+            thumbnailImageView.heightAnchor.constraint(equalToConstant: 96),
             
-            titleLabel.leadingAnchor.constraint(equalTo: thumbnailImageView.trailingAnchor, constant: 16),
-            titleLabel.topAnchor.constraint(equalTo: thumbnailImageView.topAnchor),
-            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            
-            dateLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
-            dateLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
-            dateLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
-            
-            priceLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
-            priceLabel.topAnchor.constraint(equalTo: dateLabel.bottomAnchor, constant: 8),
-            
-            buyButton.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
-            buyButton.bottomAnchor.constraint(equalTo: thumbnailImageView.bottomAnchor),
-            buyButton.heightAnchor.constraint(equalToConstant: 44),
-            buyButton.widthAnchor.constraint(equalToConstant: 140)
+            mainStack.leadingAnchor.constraint(equalTo: thumbnailImageView.trailingAnchor, constant: 12),
+            mainStack.centerYAnchor.constraint(equalTo: thumbnailImageView.centerYAnchor),
+            mainStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12)
         ])
         
-        accessoryType = .disclosureIndicator  // стрелочка вправо
+        priceTag.heightAnchor.constraint(equalToConstant: 28).isActive = true
+        priceTag.widthAnchor.constraint(greaterThanOrEqualToConstant: 60).isActive = true
+        
+        selectionStyle = .none
+        accessoryType = .disclosureIndicator
+    }
+    
+    private func loadClub(clubId: Int) {
+        NetworkManager.shared.fetchClubDetail(clubId) { [weak self] club, error in
+            DispatchQueue.main.async {
+                if let club = club {
+                    self?.organizerLabel.text = "by \(club.name)"
+                    print("Club loaded: \(club.name)")
+                } else {
+                    self?.organizerLabel.text = "by KBTU Club"
+                    if let error = error {
+                        print("Failed to load club \(clubId): \(error.localizedDescription)")
+                    }
+                }
+            }
+        }
     }
     
     func configure(with event: Event) {
         titleLabel.text = event.name
-        dateLabel.text = formatDate(event.date)  // напиши функцию форматирования
-        priceLabel.text = event.isFree ? "Бесплатно" : "\(event.price) ₸"
         
-        // Загрузка изображения (если есть media_urls)
+        if let clubId = event.club {
+            loadClub(clubId: clubId)
+        } else {
+            organizerLabel.text = "by KBTU"
+            
+        }
+        // Дата и время
+        let isoFormatter = ISO8601DateFormatter()
+        if let date = isoFormatter.date(from: event.date) {
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "ru_KZ")
+            formatter.dateFormat = "d MMMM • HH:mm"
+            dateTimeLabel.text = formatter.string(from: date)
+        } else {
+            dateTimeLabel.text = event.date
+        }
+        
+        locationLabel.text = event.location
+        
+        // Цена
+        if event.isFree {
+            priceTag.text = "FREE"
+            priceTag.backgroundColor = .systemGreen
+        } else {
+            priceTag.text = "\(event.price ?? "0") ₸"
+            priceTag.backgroundColor = UIColor(hex: "#CBDCEB")
+            priceTag.textColor = UIColor(hex: "#0C2B4E")
+        }
+        
+        // Только доступные билеты
+        ticketsLabel.text = "\(event.ticketsAvailable) билетов"
+        
+        // Изображение
+        thumbnailImageView.image = nil
         if let urlString = event.mediaUrls?.first, let url = URL(string: urlString) {
-            // Простая загрузка (или используй Kingfisher/SDWebImage)
             URLSession.shared.dataTask(with: url) { data, _, _ in
                 if let data = data, let image = UIImage(data: data) {
                     DispatchQueue.main.async {
@@ -92,15 +158,5 @@ class EventCell: UITableViewCell {
                 }
             }.resume()
         }
-    }
-    
-    private func formatDate(_ isoString: String) -> String {
-        // Простое форматирование ISO → "23 декабря, 21:00"
-        let formatter = ISO8601DateFormatter()
-        guard let date = formatter.date(from: isoString) else { return isoString }
-        let outputFormatter = DateFormatter()
-        outputFormatter.dateFormat = "d MMMM, HH:mm"
-        outputFormatter.locale = Locale(identifier: "ru_KZ")
-        return outputFormatter.string(from: date)
     }
 }

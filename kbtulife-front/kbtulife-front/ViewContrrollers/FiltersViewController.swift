@@ -7,7 +7,17 @@ class FiltersViewController: UIViewController {
     private let categoryPicker = UIPickerView()
     private let categories = ["Все", "Ярмарки", "Семинары", "Guest lectures", "Психолог", "Выездное", "Parties", "Games"]
     private var selectedCategory = "Все"
-    
+    private let categoryBackendMap: [String: String] = [
+        "Ярмарки": "fairs",
+        "Семинары": "seminars",
+        "Guest lectures": "lectures",
+        "Психолог": "psychologist",
+        "Выездное": "offsite",
+        "Вечеринки": "parties",
+        "Игры": "games",
+        "Хакатоны": "Hackathons",
+        "Воркшопы": "Workshops"
+    ]
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Фильтры"
@@ -36,7 +46,6 @@ class FiltersViewController: UIViewController {
         ])
     }
     
-    // Правильный метод — возвращает UIView с UILabel + control
     private func createRow(title: String, control: UIView) -> UIView {
         let titleLabel = UILabel()
         titleLabel.text = title
@@ -58,7 +67,6 @@ class FiltersViewController: UIViewController {
         }
         
         if selectedCategory != "Все" {
-            // Подгони под backend category field (в репо это "category")
             filters["category"] = selectedCategory.lowercased()
         }
         
@@ -67,7 +75,6 @@ class FiltersViewController: UIViewController {
     }
 }
 
-// MARK: UIPickerViewDataSource & Delegate
 extension FiltersViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         1
