@@ -88,18 +88,36 @@ class NewsCardCell: UITableViewCell {
         ])
     }
     
+//    func configure(with news: NewsItem) {
+//        titleLabel.text = news.title
+//        excerptLabel.text = String(news.content.prefix(150)) + (news.content.count > 150 ? "..." : "")
+//        categoryBadge.text = " \(news.category) "
+//        metaLabel.text = "\(news.date) • \(news.readTime)"
+//        
+//        if let urlString = news.imageUrl, let url = URL(string: urlString) {
+//            thumbnailImageView.sd_setImage(with: url, placeholderImage: UIImage(systemName: "photo"))
+//            thumbnailImageView.isHidden = false
+//        } else {
+//            thumbnailImageView.isHidden = true
+//            categoryBadge.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 16).isActive = true
+//        }
+//        
+//    }
+    
     func configure(with news: NewsItem) {
         titleLabel.text = news.title
-        excerptLabel.text = String(news.content.prefix(150)) + (news.content.count > 150 ? "..." : "")
+        excerptLabel.text = String(news.content.prefix(150)) + "..."
         categoryBadge.text = " \(news.category) "
         metaLabel.text = "\(news.date) • \(news.readTime)"
         
         if let urlString = news.imageUrl, let url = URL(string: urlString) {
             thumbnailImageView.sd_setImage(with: url, placeholderImage: UIImage(systemName: "photo"))
             thumbnailImageView.isHidden = false
+            // Активируй констрейнты с изображением
         } else {
             thumbnailImageView.isHidden = true
-            categoryBadge.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 16).isActive = true
+            thumbnailImageView.image = nil
+            // Переключи констрейнты на версию без фото
         }
     }
 }

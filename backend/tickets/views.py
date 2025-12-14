@@ -7,7 +7,6 @@ from rest_framework.decorators import action
 from .models import *
 from .serializers import *
 
-
 class TicketViewSet(viewsets.ModelViewSet):
     serializer_class = TicketSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
@@ -23,7 +22,7 @@ class TicketViewSet(viewsets.ModelViewSet):
 
         # Обычный пользователь видит только свои билеты
         return Ticket.objects.filter(user=self.request.user).select_related('event')
-
+    
     @action(detail=False, methods=['get'], url_path=r'user/(?P<user_id>[^/.]+)')
     def user_tickets(self, request, user_id=None):
         if not (request.user.is_staff or request.user.is_superuser):

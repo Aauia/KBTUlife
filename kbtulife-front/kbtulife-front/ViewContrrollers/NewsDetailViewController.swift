@@ -79,6 +79,10 @@ class NewsDetailViewController: UIViewController {
     private func configure() {
         titleLabel.text = news.title
         contentLabel.text = news.content
-        imageView.sd_setImage(with: URL(string: news.mediaUrl ?? ""), placeholderImage: UIImage(systemName: "photo"))
+        if let urlString = news.imageUrl, let url = URL(string: urlString) {
+            imageView.sd_setImage(with: url, placeholderImage: UIImage(systemName: "photo"), options: [.retryFailed, .handleCookies, .allowInvalidSSLCertificates])
+        } else {
+            imageView.image = UIImage(systemName: "photo")
+        }
     }
 }

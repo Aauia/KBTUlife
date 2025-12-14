@@ -1,4 +1,3 @@
-// ClubsViewController.swift
 import UIKit
 
 class ClubsViewController: UIViewController {

@@ -28,7 +28,6 @@ class NetworkManager {
     
     // MARK: - Authentication
     
-    // ✅ FIXED: Better error handling for login
     func login(outlook: String, password: String, completion: @escaping (User?, Error?) -> Void) {
         let url = baseURL + "api/login/"
         let parameters: [String: Any] = [
@@ -83,7 +82,7 @@ class NetworkManager {
             }
     }
     
-    // ✅ FIXED: Better error handling for registration
+
     func register(outlook: String, firstName: String, lastName: String, phone: String?, password: String, completion: @escaping (User?, Error?) -> Void) {
         let url = baseURL + "api/register/"
         var parameters: [String: Any] = [
@@ -190,7 +189,15 @@ class NetworkManager {
     
     func get<T: Decodable>(url: String, completion: @escaping (T?, Error?) -> Void) {
         let fullURL = baseURL + url
+        // Было: AF.request → Не отправляет куки!
+        // Стало: session.request → отправляет куки из HTTPCookieStorage
         session.request(fullURL, headers: headers).responseDecodable(of: T.self) { response in
+            if let error = response.error {
+                print("Network error: \(error)")
+                if let data = response.data, let str = String(data: data, encoding: .utf8) {
+                    print("Response body: \(str)")
+                }
+            }
             switch response.result {
             case .success(let value):
                 completion(value, nil)
@@ -199,9 +206,10 @@ class NetworkManager {
             }
         }
     }
-    
+
     func post<T: Decodable>(url: String, parameters: [String: Any], completion: @escaping (T?, Error?) -> Void) {
         let fullURL = baseURL + url
+        // То же самое — используй session, а не AF
         session.request(fullURL, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
             .responseDecodable(of: T.self) { response in
                 switch response.result {
@@ -243,9 +251,16 @@ class NetworkManager {
     // MARK: - Tickets
     
     func fetchMyTickets(completion: @escaping ([Ticket]?, Error?) -> Void) {
-        get(url: "tickets/", completion: completion)
+        let url = "tickets/"
+        AF.request(baseURL + url, headers: headers).responseDecodable(of: [Ticket].self) { response in
+            switch response.result {
+            case .success(let tickets):
+                completion(tickets, nil)
+            case .failure(let error):
+                completion(nil, error)
+            }
+        }
     }
-    
     func buyTicket(eventId: Int, completion: @escaping (Ticket?, Error?) -> Void) {
         let url = "tickets/"
         let parameters: [String: Any] = ["event_id": eventId]
@@ -293,7 +308,7 @@ class NetworkManager {
     }
 
     func fetchClubDetail(_ id: Int, completion: @escaping (Club?, Error?) -> Void) {
-        let url = "clubs/\(id)/"
+        let url = "clubs/clubs/\(id)/"
         get(url: url, completion: completion)
     }
     
