@@ -15,7 +15,7 @@ from .views import (
 
 urlpatterns = [
     # Club endpoints
-    path('clubs/', ClubListAPIView.as_view(), name='club_list'),          # List all clubs
+    path('', ClubListAPIView.as_view(), name='club_list'),          # List all clubs
     path('clubs/<int:pk>/', ClubDetailAPIView.as_view(), name='club_detail'),  # Retrieve a club
     path('clubs/create/', ClubCreateAPIView.as_view(), name='club_create'),     # Create a club
     path('clubs/<int:pk>/update/', ClubUpdateAPIView.as_view(), name='club_update'), # Update a club
