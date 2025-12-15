@@ -30,7 +30,7 @@ class PaymentViewController: UIViewController {
         instructionLabel.textColor = .secondaryLabel
 
         paidButton.titleLabel?.font = .boldSystemFont(ofSize: 18)
-        paidButton.backgroundColor = UIColor(hex: "#FF6900") // оранжевый Kaspi стиль
+        paidButton.backgroundColor = UIColor(hex: "#FF6900")
         paidButton.setTitleColor(.white, for: .normal)
         paidButton.layer.cornerRadius = 12
 
@@ -68,7 +68,7 @@ class PaymentViewController: UIViewController {
                     // Успешно отметили оплату
                     let alert = UIAlertController(title: "Спасибо!", message: "Ваш платёж принят. Билет появится в разделе «Мои билеты» после подтверждения.", preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
-                        // Важно: уведомляем приложение, что билеты изменились
+                        // уведомляем приложение, что билеты изменились
                         NotificationCenter.default.post(name: NSNotification.Name("TicketsUpdated"), object: nil)
                         
                         // Возвращаемся на главный таб (или на события)

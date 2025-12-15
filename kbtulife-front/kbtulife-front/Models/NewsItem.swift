@@ -11,10 +11,20 @@ struct NewsItem: Codable {
     let contentKk: String?
     let contentRu: String?
     let contentEn: String?
-    let mediaUrl: String?
+    let mediaUrl: String?           // старое поле "media_url"
     let createdAt: String
     
-    var imageUrl: String? { mediaUrl }
+    let media_urls: [String]?       // новое поле "media_urls" из API
+    
+    // Это computed property — оно НЕ нужно в CodingKeys
+    var imageUrl: String? {
+        // Сначала пытаемся взять из нового поля media_urls
+        if let urls = media_urls, let first = urls.first, !first.isEmpty {
+            return first
+        }
+        // Если нет — фолбэк на старое поле
+        return mediaUrl
+    }
     
     var category: String = "General"
     var readTime: String = "3 min"
@@ -31,8 +41,10 @@ struct NewsItem: Codable {
         return "Today"
     }
     
+    // ВАЖНО: Здесь перечисляем ТОЛЬКО реальные свойства (let), а НЕ computed (var imageUrl, var date и т.д.)
     enum CodingKeys: String, CodingKey {
-        case id, title
+        case id
+        case title
         case titleKk = "title_kk"
         case titleRu = "title_ru"
         case titleEn = "title_en"
@@ -42,5 +54,6 @@ struct NewsItem: Codable {
         case contentEn = "content_en"
         case mediaUrl = "media_url"
         case createdAt = "created_at"
+        case media_urls = "media_urls"  // ← Эта строка обязательна!
     }
 }
