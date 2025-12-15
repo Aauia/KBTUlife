@@ -5,6 +5,7 @@ class ClubsViewController: UIViewController {
     private let tableView = UITableView()
     private let activityIndicator = UIActivityIndicatorView(style: .large)
     private var clubs: [Club] = []
+    private let searchButton = UIButton(type: .system)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -13,6 +14,7 @@ class ClubsViewController: UIViewController {
         
         setupUI()
         loadClubs()
+        setupSearchButton()
     }
     
     private func setupUI() {
@@ -66,6 +68,20 @@ class ClubsViewController: UIViewController {
     
     @objc private func refreshClubs() {
         loadClubs()
+    }
+    
+    private func setupSearchButton() {
+        let config = UIImage.SymbolConfiguration(pointSize: 20, weight: .medium)
+        searchButton.setImage(UIImage(systemName: "magnifyingglass", withConfiguration: config), for: .normal)
+        searchButton.tintColor = UIColor(hex: "#0C2B4E")
+        searchButton.addTarget(self, action: #selector(searchTapped), for: .touchUpInside)
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: searchButton)
+    }
+
+    @objc private func searchTapped() {
+        let searchVC = SearchViewController()
+        navigationController?.pushViewController(searchVC, animated: true)
     }
     
     private func showError(message: String) {

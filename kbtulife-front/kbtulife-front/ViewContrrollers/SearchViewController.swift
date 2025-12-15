@@ -41,9 +41,12 @@ class SearchViewController: UIViewController {
         
         var imageUrl: String? {
             switch self {
-            case .event(let event): return event.mediaUrls?.first
-            case .news(let news): return news.imageUrl
-            case .club(let club): return club.mediaUrls?.first
+            case .event(let event):
+                return event.mediaUrls?.first
+            case .news(let news):
+                return news.imageUrl
+            case .club:
+                return nil 
             }
         }
     }

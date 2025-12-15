@@ -33,6 +33,7 @@ class PaymentViewController: UIViewController {
         paidButton.backgroundColor = UIColor(hex: "#FF6900")
         paidButton.setTitleColor(.white, for: .normal)
         paidButton.layer.cornerRadius = 12
+        
 
         let stack = UIStackView(arrangedSubviews: [kaspiNumberLabel, instructionLabel, paidButton])
         stack.axis = .vertical

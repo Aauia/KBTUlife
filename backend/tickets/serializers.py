@@ -6,6 +6,7 @@ from io import BytesIO
 import base64
 
 class TicketSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     user_email = serializers.CharField(source='user.outlook', read_only=True)
     event = EventSerializer(read_only=True)  
     event_id = serializers.PrimaryKeyRelatedField(

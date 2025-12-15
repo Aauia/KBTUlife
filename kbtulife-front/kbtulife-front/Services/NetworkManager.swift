@@ -222,9 +222,33 @@ class NetworkManager {
     }
     
     func buyTicket(eventId: Int, completion: @escaping (Ticket?, Error?) -> Void) {
-        let parameters: [String: Any] = ["event": eventId]  
+        let url = "tickets/"
+        let parameters: [String: Any] = ["event_id": eventId]  // <-- именно "event_id"
         
-        post(url: "tickets/", parameters: parameters, completion: completion)
+        session.request(baseURL + url,
+                        method: .post,
+                        parameters: parameters,
+                        encoding: JSONEncoding.default,  // <-- критично: тело как JSON
+                        headers: headers)
+            .validate(statusCode: 200..<300)  // покажет 400/401 явно
+            .responseDecodable(of: Ticket.self) { response in
+                // Логируем всё для отладки
+                debugPrint("Request URL: \(response.request?.url?.absoluteString ?? "nil")")
+                debugPrint("Request Body: \(String(data: response.request?.httpBody ?? Data(), encoding: .utf8) ?? "nil")")
+                debugPrint("Status Code: \(response.response?.statusCode ?? -1)")
+                
+                if let data = response.data,
+                   let errorString = String(data: data, encoding: .utf8) {
+                    print("Сервер вернул: \(errorString)")
+                }
+                
+                switch response.result {
+                case .success(let ticket):
+                    completion(ticket, nil)
+                case .failure(let error):
+                    completion(nil, error)
+                }
+            }
     }
     
     func markAsPending(ticketId: Int, completion: @escaping (String?, Error?) -> Void) {
