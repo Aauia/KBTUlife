@@ -1,20 +1,16 @@
 import UIKit
 
 class NewsViewController: UIViewController {
-    
     private let headerView = UIView()
     private let tableView = UITableView()
-    
     private var newsItems: [NewsItem] = []
     private var filteredNews: [NewsItem] = []
-    
     private var unreadCount = 3
     let searchButton = UIButton(type: .system)
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(hex: "#F8F9FA")
-        
         setupHeader()
         setupSearchButton()
         setupTableView()
@@ -36,7 +32,7 @@ class NewsViewController: UIViewController {
         
         if unreadCount > 0 {
             let badge = UILabel()
-            badge.text = "\(unreadCount)"
+            badge.text = "\(unreadCount)" // Исправлено: вставляем значение unreadCount
             badge.font = .systemFont(ofSize: 10, weight: .heavy)
             badge.textColor = .white
             badge.backgroundColor = .systemRed
@@ -55,7 +51,7 @@ class NewsViewController: UIViewController {
         }
         
         let titleLabel = UILabel()
-        titleLabel.text = "Campus News"
+        titleLabel.text = NSLocalizedString("campus_news_title", comment: "")
         titleLabel.font = .systemFont(ofSize: 30, weight: .black)
         titleLabel.textColor = UIColor(hex: "#0C2B4E")
         
@@ -96,7 +92,11 @@ class NewsViewController: UIViewController {
     }
     
     @objc private func showNotifications() {
-        let alert = UIAlertController(title: "Уведомления", message: "В разработке", preferredStyle: .alert)
+        let alert = UIAlertController(
+            title: NSLocalizedString("notifications_title", comment: ""),
+            message: NSLocalizedString("notifications_message", comment: ""),
+            preferredStyle: .alert
+        )
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }
@@ -104,7 +104,7 @@ class NewsViewController: UIViewController {
     private func setupSearchButton() {
         searchButton.backgroundColor = UIColor(hex: "#FFFFFF")
         searchButton.layer.cornerRadius = 14
-        searchButton.setTitle("  Search…", for: .normal)
+        searchButton.setTitle(" " + NSLocalizedString("search_placeholder", comment: ""), for: .normal)
         searchButton.setTitleColor(.secondaryLabel, for: .normal)
         searchButton.titleLabel?.font = .systemFont(ofSize: 16)
         searchButton.contentHorizontalAlignment = .left
@@ -129,7 +129,6 @@ class NewsViewController: UIViewController {
             searchButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             searchButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             searchButton.heightAnchor.constraint(equalToConstant: 48)
-            
         ])
     }
     
@@ -150,12 +149,10 @@ class NewsViewController: UIViewController {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            // Отступ таблицы уменьшен до 8
             tableView.topAnchor.constraint(equalTo: searchButton.bottomAnchor, constant: 8),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-            
         ])
     }
     
@@ -172,7 +169,7 @@ class NewsViewController: UIViewController {
                     self?.filteredNews = items
                     self?.tableView.reloadData()
                 } else if let error = error {
-                    print("Ошибка при получении новостей: \(error.localizedDescription)")
+                    print(NSLocalizedString("news_fetch_error", comment: "").replacingOccurrences(of: "%@", with: error.localizedDescription))
                 }
             }
         }

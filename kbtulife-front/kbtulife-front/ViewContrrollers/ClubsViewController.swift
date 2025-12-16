@@ -9,7 +9,7 @@ class ClubsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Клубы"
+        title = NSLocalizedString("clubs_title", comment: "")
         view.backgroundColor = .systemBackground
         
         setupUI()
@@ -18,7 +18,6 @@ class ClubsViewController: UIViewController {
     }
     
     private func setupUI() {
-        // Table View
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(ClubCell.self, forCellReuseIdentifier: "ClubCell")
@@ -28,7 +27,6 @@ class ClubsViewController: UIViewController {
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         
-        // Activity Indicator
         view.addSubview(activityIndicator)
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         
@@ -42,7 +40,6 @@ class ClubsViewController: UIViewController {
             activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
         
-        // Add refresh control
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(refreshClubs), for: .valueChanged)
         tableView.refreshControl = refreshControl
@@ -78,14 +75,18 @@ class ClubsViewController: UIViewController {
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: searchButton)
     }
-
+    
     @objc private func searchTapped() {
         let searchVC = SearchViewController()
         navigationController?.pushViewController(searchVC, animated: true)
     }
     
     private func showError(message: String) {
-        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
+        let alert = UIAlertController(
+            title: NSLocalizedString("error_title", comment: ""),
+            message: message,
+            preferredStyle: .alert
+        )
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }

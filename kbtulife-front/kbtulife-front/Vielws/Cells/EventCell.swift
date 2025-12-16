@@ -8,7 +8,7 @@ class EventCell: UITableViewCell {
     private let locationLabel = UILabel()
     private let priceTag = UILabel()
     private let ticketsLabel = UILabel()
-
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -27,13 +27,11 @@ class EventCell: UITableViewCell {
         clipsToBounds = false
         contentView.clipsToBounds = false
         
-        // Thumbnail
         thumbnailImageView.contentMode = .scaleAspectFill
         thumbnailImageView.clipsToBounds = true
         thumbnailImageView.layer.cornerRadius = 12
         thumbnailImageView.backgroundColor = .systemGray5
         
-        // Labels
         titleLabel.font = .systemFont(ofSize: 15, weight: .medium)
         titleLabel.textColor = .label
         titleLabel.numberOfLines = 2
@@ -56,7 +54,6 @@ class EventCell: UITableViewCell {
         ticketsLabel.font = .systemFont(ofSize: 12)
         ticketsLabel.textColor = .secondaryLabel
         
-        // Stacks
         let infoStack = UIStackView(arrangedSubviews: [titleLabel, organizerLabel, dateTimeLabel, locationLabel])
         infoStack.axis = .vertical
         infoStack.spacing = 6
@@ -101,12 +98,8 @@ class EventCell: UITableViewCell {
             DispatchQueue.main.async {
                 if let club = club {
                     self?.organizerLabel.text = "by \(club.name)"
-                    print("Club loaded: \(club.name)")
                 } else {
-                    self?.organizerLabel.text = "by KBTU Club"
-                    if let error = error {
-                        print("Failed to load club \(clubId): \(error.localizedDescription)")
-                    }
+                    self?.organizerLabel.text = "by KBTU"
                 }
             }
         }
@@ -119,13 +112,12 @@ class EventCell: UITableViewCell {
             loadClub(clubId: clubId)
         } else {
             organizerLabel.text = "by KBTU"
-            
         }
-        // Дата и время
+        
         let isoFormatter = ISO8601DateFormatter()
         if let date = isoFormatter.date(from: event.date) {
             let formatter = DateFormatter()
-            formatter.locale = Locale(identifier: "ru_KZ")
+            formatter.locale = Locale.current
             formatter.dateFormat = "d MMMM • HH:mm"
             dateTimeLabel.text = formatter.string(from: date)
         } else {
@@ -134,9 +126,8 @@ class EventCell: UITableViewCell {
         
         locationLabel.text = event.location
         
-        // Цена
         if event.isFree {
-            priceTag.text = "FREE"
+            priceTag.text = NSLocalizedString("event_free_tag", comment: "")
             priceTag.backgroundColor = .systemGreen
         } else {
             priceTag.text = "\(event.price ?? "0") ₸"
@@ -144,10 +135,8 @@ class EventCell: UITableViewCell {
             priceTag.textColor = UIColor(hex: "#0C2B4E")
         }
         
-        // Только доступные билеты
-        ticketsLabel.text = "\(event.ticketsAvailable) билетов"
+        ticketsLabel.text = String(format: NSLocalizedString("event_tickets_label", comment: ""), event.ticketsAvailable)
         
-        // Изображение
         thumbnailImageView.image = nil
         if let urlString = event.mediaUrls?.first, let url = URL(string: urlString) {
             URLSession.shared.dataTask(with: url) { data, _, _ in

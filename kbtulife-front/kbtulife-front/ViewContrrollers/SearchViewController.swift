@@ -1,6 +1,7 @@
 import UIKit
 
 class SearchViewController: UIViewController {
+    
     private let tableView = UITableView()
     private let searchBar = UISearchBar()
     
@@ -33,9 +34,9 @@ class SearchViewController: UIViewController {
         
         var type: String {
             switch self {
-            case .event: return "Event"
-            case .news: return "News"
-            case .club: return "Club"
+            case .event: return NSLocalizedString("search_type_event", comment: "")
+            case .news: return NSLocalizedString("search_type_news", comment: "")
+            case .club: return NSLocalizedString("search_type_club", comment: "")
             }
         }
         
@@ -46,18 +47,18 @@ class SearchViewController: UIViewController {
             case .news(let news):
                 return news.imageUrl
             case .club:
-                return nil 
+                return nil
             }
         }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Search"
+        title = NSLocalizedString("search_title", comment: "")
         view.backgroundColor = .systemBackground
         
         searchBar.delegate = self
-        searchBar.placeholder = "Search events, news, clubs..."
+        searchBar.placeholder = NSLocalizedString("search_placeholder", comment: "")
         searchBar.showsCancelButton = true
         navigationItem.titleView = searchBar
         
@@ -101,7 +102,7 @@ class SearchViewController: UIViewController {
         }
         
         group.notify(queue: .main) {
-            self.searchBar.becomeFirstResponder() // фокус на поиск сразу
+            self.searchBar.becomeFirstResponder()
         }
     }
     
@@ -110,15 +111,12 @@ class SearchViewController: UIViewController {
         
         var results: [SearchResult] = []
         
-        // Events
         results += allEvents.filter { $0.name.lowercased().contains(lowerQuery) || $0.description.lowercased().contains(lowerQuery) }
             .map { SearchResult.event($0) }
         
-        // News
         results += allNews.filter { $0.title.lowercased().contains(lowerQuery) }
             .map { SearchResult.news($0) }
         
-        // Clubs
         results += allClubs.filter { $0.name.lowercased().contains(lowerQuery) }
             .map { SearchResult.club($0) }
         
@@ -172,7 +170,7 @@ extension SearchViewController: UITableViewDataSource, UITableViewDelegate {
             let detailVC = NewsDetailViewController(news: news)
             navigationController?.pushViewController(detailVC, animated: true)
         case .club(let club):
-            let detailVC = ClubDetailViewController(club: club) // создай, если нет
+            let detailVC = ClubDetailViewController(club: club)
             navigationController?.pushViewController(detailVC, animated: true)
         }
     }

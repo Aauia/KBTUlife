@@ -1,10 +1,3 @@
-//
-//  AppDelegate.swift
-//  kbtulife-front
-//
-//  Created by Nazerke Zheken on 12.12.2025.
-//
-
 import UIKit
 
 @main

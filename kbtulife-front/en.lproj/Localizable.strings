@@ -1,7 +1,164 @@
-/* 
-  Localizable.strings
-  kbtulife-front
+"events" = "Events";
+"news" = "News";
+"clubs" = "Clubs";
+"tickets" = "My Tickets";
+"profile" = "Profile";
 
-  Created by Nazerke Zheken on 16.12.2025.
-  
-*/
+"search_placeholder" = "Search events, news, clubs...";
+"no_results" = "No results found";
+"no_events_found" = "No events found";
+
+"price_filter_all" = "All";
+"price_filter_free" = "Free";
+"price_filter_paid" = "Paid";
+
+"tab_home" = "Home";
+"tab_events" = "Events";
+"tab_clubs" = "Clubs";
+"tab_tickets" = "Tickets";
+"tab_profile" = "Profile";
+"tab_admin" = "Admin";
+
+"by" = "by";
+"by_kbtu" = "by KBTU";
+
+"get_ticket_free" = "Get Ticket • FREE";
+"get_ticket_price" = "Get Ticket • %@ ₸";
+"sold_out" = "Sold Out";
+
+"ticket_received_title" = "Ticket Received! 🎉";
+"ticket_received_message" = "Free ticket for \"%@\" added to \"My Tickets\"";
+"ticket_received_ok" = "Great!";
+
+"ticket_error" = "Failed to create ticket";
+"error" = "Error";
+
+"payment_title" = "Payment";
+"copy_button" = "Copy";
+"copied" = "Copied!";
+"paid_button" = "I Paid";
+"processing" = "Processing...";
+
+"payment_instruction" = "Transfer the amount to Kaspi Gold.\nBe sure to indicate in the comment:\n%@";
+
+"payment_success_title" = "Success!";
+"payment_success_message" = "Your payment has been sent for verification. The ticket will be activated within 15 minutes.";
+"payment_success_ok" = "Great";
+
+"payment_error_title" = "Error";
+"payment_error_message" = "Network error";
+
+"filters_title" = "Filters";
+"free_events" = "Free only";
+"category" = "Category";
+"apply" = "Apply";
+
+"tickets_title" = "My Tickets";
+"no_tickets_title" = "No tickets yet";
+"no_tickets_subtitle" = "Start exploring events to get your first ticket";
+
+"active_tickets_header" = "Active Tickets";
+"past_tickets_header" = "Past Events";
+
+"active_tickets_subtitle_zero" = "No active tickets";
+"active_tickets_subtitle_one" = "1 active ticket";
+"active_tickets_subtitle_many" = "%d active tickets";
+
+"error_title" = "Error";
+
+"purchased_label" = "Purchased: %@";
+"qr_button" = "QR Code";
+
+"unknown_date" = "Unknown Date";
+
+"status_paid" = "✅ Paid";
+"status_pending" = "⏳ Pending verification";
+"status_unpaid" = "🔴 Unpaid";
+"status_used" = "Used";
+"status_free" = "Free";
+
+"clubs_title" = "Clubs";
+"error_title" = "Error";
+
+"profile_title" = "Profile";
+"achievements_title" = "Achievements";
+"my_clubs" = "My Clubs";
+"event_history" = "Event History";
+"my_reviews" = "My Reviews";
+"admin_dashboard" = "Admin Dashboard";
+"logout" = "Logout";
+"language_title" = "App Language";
+"language_changed_title" = "Language Changed";
+"language_changed_message" = "The app will restart to apply the language";
+"logout_failed_title" = "Logout Failed";
+"logout_failed_message" = "Please try again";
+
+"campus_news_title" = "Campus News";
+"notifications_title" = "Notifications";
+"notifications_message" = "In development";
+"search_placeholder" = "Search…";
+"news_fetch_error" = "Error fetching news: %@";
+
+"search_title" = "Search";
+"search_placeholder" = "Search events, news, clubs...";
+"search_type_event" = "Event";
+"search_type_news" = "News";
+"search_type_club" = "Club";
+
+"qr_scanner_title" = "QR Scanner";
+"ticket_valid_title" = "Ticket Valid";
+"ticket_valid_message" = "Event: %@\nEmail: %@";
+"mark_used_button" = "Mark as Used";
+"cancel_button" = "Cancel";
+"error_title" = "Error";
+"invalid_qr_message" = "Invalid QR code";
+
+"onboarding_welcome_title" = "Welcome to KBTUlife";
+"onboarding_welcome_desc" = "University life is not just about classes, it's late-night events, spontaneous plans, new people, crazy ideas, and the moments you'll remember years later.";
+"onboarding_welcome_subtitle" = "Let's make your student life brighter.";
+
+"onboarding_fun_title" = "Never Miss the Fun Again";
+"onboarding_fun_desc" = "Parties, seminars, fairs, guest lectures, games, workshops... Campus is full of moments waiting for you.";
+"onboarding_fun_subtitle" = "Get personalized suggestions so you're always in the right place at the right time.";
+
+"onboarding_people_title" = "Find Your People";
+"onboarding_people_desc" = "Tech clubs, creative clubs, business communities — join the teams that inspire you.";
+"onboarding_people_subtitle" = "Make friends, start projects, grow your skills, and create memories with your clubmates.";
+
+"onboarding_journey_title" = "Track Your Journey, Level Up Your Vibes";
+"onboarding_journey_desc" = "Grab tickets with one tap, keep them safe in your profile, and earn achievements as you explore campus life.";
+"onboarding_journey_subtitle" = "Turn your student years into something legendary.";
+
+"onboarding_final_title" = "Let's Make These Years Unforgettable";
+"onboarding_final_desc" = "Sign up and start your journey — the campus is waiting for you.";
+"onboarding_final_subtitle" = "";
+
+"onboarding_skip" = "Skip";
+"onboarding_next" = "Next";
+"onboarding_lets_go" = "Let's Go 🚀";
+
+"news_detail_title" = "News Detail";
+
+"club_instagram_button" = "Instagram";
+"club_apply_button" = "Apply";
+"club_members_label" = "%d members";
+"club_events_label" = "%d events";
+"club_apply_success_title" = "Success!";
+"club_apply_success_message" = "Your application has been sent";
+"club_apply_error_title" = "Error";
+
+"event_free_tag" = "FREE";
+"event_tickets_label" = "%d tickets";
+
+"news_read_time" = "%@ min read";
+
+"category_all" = "All";
+"category_fairs" = "Fairs";
+"category_seminars" = "Seminars";
+"category_lectures" = "Guest lectures";
+"category_psychologist" = "Psychologist";
+"category_offsite" = "Offsite";
+"category_parties" = "Parties";
+"category_games" = "Games";
+"category_hackathons" = "Hackathons";
+"category_workshops" = "Workshops";

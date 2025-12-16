@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		DA18FA322EEC422300ECB782 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DA18FA312EEC422300ECB782 /* Alamofire */; };
 		DAA5E94B2EED8EE800DCFFCE /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = DAA5E94A2EED8EE800DCFFCE /* SDWebImage */; };
+		DADC58A72EF0B7DA00A95562 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = DADC58A52EF0B7DA00A95562 /* Localizable.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -32,6 +33,9 @@
 		DA18F9FC2EEC3E7000ECB782 /* kbtulife-front.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "kbtulife-front.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA18FA122EEC3E7100ECB782 /* kbtulife-frontTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "kbtulife-frontTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA18FA1C2EEC3E7100ECB782 /* kbtulife-frontUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "kbtulife-frontUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DADC58A62EF0B7DA00A95562 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DADC58A82EF0B82500A95562 /* kk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = kk; path = kk.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DADC58A92EF0B82600A95562 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -95,6 +99,7 @@
 		DA18F9F32EEC3E7000ECB782 = {
 			isa = PBXGroup;
 			children = (
+				DADC58A52EF0B7DA00A95562 /* Localizable.strings */,
 				DA18F9FE2EEC3E7000ECB782 /* kbtulife-front */,
 				DA18FA152EEC3E7100ECB782 /* kbtulife-frontTests */,
 				DA18FA1F2EEC3E7100ECB782 /* kbtulife-frontUITests */,
@@ -214,6 +219,8 @@
 			knownRegions = (
 				en,
 				Base,
+				ru,
+				kk,
 			);
 			mainGroup = DA18F9F32EEC3E7000ECB782;
 			minimizedProjectReferenceProxies = 1;
@@ -239,6 +246,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DADC58A72EF0B7DA00A95562 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -295,6 +303,19 @@
 		};
 /* End PBXTargetDependency section */
 
+/* Begin PBXVariantGroup section */
+		DADC58A52EF0B7DA00A95562 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DADC58A62EF0B7DA00A95562 /* en */,
+				DADC58A82EF0B82500A95562 /* kk */,
+				DADC58A92EF0B82600A95562 /* ru */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
 /* Begin XCBuildConfiguration section */
 		DA18FA262EEC3E7100ECB782 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -305,6 +326,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "kbtulife-front/Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -332,6 +354,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "kbtulife-front/Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -355,6 +378,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -418,6 +442,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";

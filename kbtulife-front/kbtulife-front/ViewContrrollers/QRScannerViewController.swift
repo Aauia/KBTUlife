@@ -7,12 +7,13 @@ class QRScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsD
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "QR Scanner"
+        title = NSLocalizedString("qr_scanner_title", comment: "")
         view.backgroundColor = .black
         
         captureSession = AVCaptureSession()
         guard let videoCaptureDevice = AVCaptureDevice.default(for: .video) else { return }
         let videoInput: AVCaptureDeviceInput
+        
         do {
             videoInput = try AVCaptureDeviceInput(device: videoCaptureDevice)
         } catch {
@@ -54,17 +55,19 @@ class QRScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsD
         NetworkManager.shared.validateQR(qrCode: code) { [weak self] ticket, error in
             DispatchQueue.main.async {
                 if let ticket = ticket {
-                    // Валиден — покажи алерт
-                    let alert = UIAlertController(title: "Билет валиден", message: "Event: \(ticket.event.name)\nEmail: \(ticket.userEmail ?? "—")", preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: "Отметить использованным", style: .destructive) { _ in
-                        // Вызов mark-as-used 
+                    let email = ticket.userEmail ?? "—"
+                    let message = String(format: NSLocalizedString("ticket_valid_message", comment: ""), ticket.event.name, email)
+                    let alert = UIAlertController(title: NSLocalizedString("ticket_valid_title", comment: ""), message: message, preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: NSLocalizedString("mark_used_button", comment: ""), style: .destructive) { _ in
+                        // Здесь вызов mark-as-used
                     })
-                    alert.addAction(UIAlertAction(title: "Отмена", style: .cancel) { _ in
+                    alert.addAction(UIAlertAction(title: NSLocalizedString("cancel_button", comment: ""), style: .cancel) { _ in
                         self?.captureSession.startRunning()
                     })
                     self?.present(alert, animated: true)
                 } else {
-                    let alert = UIAlertController(title: "Ошибка", message: error?.localizedDescription ?? "Невалидный QR", preferredStyle: .alert)
+                    let errorMessage = error?.localizedDescription ?? NSLocalizedString("invalid_qr_message", comment: "")
+                    let alert = UIAlertController(title: NSLocalizedString("error_title", comment: ""), message: errorMessage, preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
                         self?.captureSession.startRunning()
                     })

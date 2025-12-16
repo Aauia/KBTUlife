@@ -1,13 +1,32 @@
 import UIKit
 
-class OnboardingViewController: UIViewController {
+final class OnboardingViewController: UIViewController {
     
     private let slides = [
-        Slide(icon: "🎓", title: "Welcome to KBTUlife", description: "University life is not just about classes, it's late-night events, spontaneous plans, new people, crazy ideas, and the moments you'll remember years later.", subtitle: "Let's make your student life brighter."),
-        Slide(icon: "🎉", title: "Never Miss the Fun Again", description: "Parties, seminars, fairs, guest lectures, games, workshops... Campus is full of moments waiting for you.", subtitle: "Get personalized suggestions so you're always in the right place at the right time."),
-        Slide(icon: "🤝", title: "Find Your People", description: "Tech clubs, creative clubs, business communities — join the teams that inspire you.", subtitle: "Make friends, start projects, grow your skills, and create memories with your clubmates."),
-        Slide(icon: "🎫", title: "Track Your Journey, Level Up Your Vibes", description: "Grab tickets with one tap, keep them safe in your profile, and earn achievements as you explore campus life.", subtitle: "Turn your student years into something legendary."),
-        Slide(icon: "✨", title: "Let's Make These Years Unforgettable", description: "Sign up and start your journey — the campus is waiting for you.", subtitle: "")
+        Slide(icon: "🎓",
+              title: NSLocalizedString("onboarding_welcome_title", comment: ""),
+              description: NSLocalizedString("onboarding_welcome_desc", comment: ""),
+              subtitle: NSLocalizedString("onboarding_welcome_subtitle", comment: "")),
+        
+        Slide(icon: "🎉",
+              title: NSLocalizedString("onboarding_fun_title", comment: ""),
+              description: NSLocalizedString("onboarding_fun_desc", comment: ""),
+              subtitle: NSLocalizedString("onboarding_fun_subtitle", comment: "")),
+        
+        Slide(icon: "🤝",
+              title: NSLocalizedString("onboarding_people_title", comment: ""),
+              description: NSLocalizedString("onboarding_people_desc", comment: ""),
+              subtitle: NSLocalizedString("onboarding_people_subtitle", comment: "")),
+        
+        Slide(icon: "🎫",
+              title: NSLocalizedString("onboarding_journey_title", comment: ""),
+              description: NSLocalizedString("onboarding_journey_desc", comment: ""),
+              subtitle: NSLocalizedString("onboarding_journey_subtitle", comment: "")),
+        
+        Slide(icon: "✨",
+              title: NSLocalizedString("onboarding_final_title", comment: ""),
+              description: NSLocalizedString("onboarding_final_desc", comment: ""),
+              subtitle: NSLocalizedString("onboarding_final_subtitle", comment: ""))
     ]
     
     private var currentPage = 0
@@ -138,9 +157,9 @@ class OnboardingViewController: UIViewController {
         view.addSubview(pageControl)
         pageControl.translatesAutoresizingMaskIntoConstraints = false
     }
-
+    
     private func setupSkipButton() {
-        skipButton.setTitle("Skip", for: .normal)
+        skipButton.setTitle(NSLocalizedString("onboarding_skip", comment: ""), for: .normal)
         skipButton.setTitleColor(.white, for: .normal)
         skipButton.titleLabel?.font = .systemFont(ofSize: 16)
         skipButton.addTarget(self, action: #selector(skipOnboarding), for: .touchUpInside)
@@ -181,7 +200,7 @@ class OnboardingViewController: UIViewController {
     
     private func updateNextButtonTitle() {
         let isLast = currentPage == slides.count - 1
-        nextButton.setTitle(isLast ? "Let's Go 🚀" : "Next", for: .normal)
+        nextButton.setTitle(isLast ? NSLocalizedString("onboarding_lets_go", comment: "") : NSLocalizedString("onboarding_next", comment: ""), for: .normal)
         
         nextButton.subviews.filter { $0 is UIImageView }.forEach { $0.removeFromSuperview() }
         if !isLast {
@@ -218,6 +237,7 @@ class OnboardingViewController: UIViewController {
         let loginVC = LoginViewController()
         let nav = UINavigationController(rootViewController: loginVC)
         UIApplication.shared.windows.first?.rootViewController = nav
+        UIApplication.shared.windows.first?.makeKeyAndVisible()
     }
 }
 
