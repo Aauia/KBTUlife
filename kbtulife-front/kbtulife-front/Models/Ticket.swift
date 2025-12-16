@@ -9,7 +9,7 @@ struct Ticket: Codable {
     let paymentStatus: String
     let used: Bool
     let createdAt: String
-    let qrCodeImageBase64: String?  // новое поле из сериализатора
+    let qrCodeImageBase64: String?
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -21,14 +21,10 @@ struct Ticket: Codable {
         case createdAt = "created_at"
         case qrCodeImageBase64 = "qr_code_image"
     }
-
-    // Основной способ — генерируем сами (быстрее, не зависит от сервера)
     var qrCodeImage: UIImage? {
-        // Сначала пробуем сгенерировать сами
         if let image = generateQRCode(from: qrcode) {
             return image
         }
-        // Fallback: если есть base64 от сервера
         if let base64 = qrCodeImageBase64,
            let data = Data(base64Encoded: base64.replacingOccurrences(of: "data:image/png;base64,", with: "")),
            let image = UIImage(data: data) {

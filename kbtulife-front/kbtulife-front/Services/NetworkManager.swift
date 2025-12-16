@@ -1,4 +1,3 @@
-// NetworkManager.swift
 import Alamofire
 import Foundation
 
@@ -44,7 +43,6 @@ class NetworkManager {
                     if let loginResponse = try? JSONDecoder().decode(LoginResponse.self, from: data),
                        let user = loginResponse.user {
                         
-                        // Сессия и куки (включая sessionid и csrftoken) уже автоматически сохранены Alamofire
                         UserDefaults.standard.set(true, forKey: "isLoggedIn")
                         completion(user, nil)
                         
@@ -122,12 +120,9 @@ class NetworkManager {
             .response { response in
                 switch response.result {
                 case .success:
-                    // Очищаем всё локально
-                    UserDefaults.standard.removeObject(forKey: "isLoggedIn")
-                    HTTPCookieStorage.shared.removeCookies(since: Date.distantPast) // iOS 11+
-                    // Для старых iOS можно по одной:
-                    // HTTPCookieStorage.shared.cookies?.forEach { HTTPCookieStorage.shared.deleteCookie($0) }
                     
+                    UserDefaults.standard.removeObject(forKey: "isLoggedIn")
+                    HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
                     completion(true, nil)
                 case .failure(let error):
                     print("Logout failed:", error)
@@ -223,16 +218,16 @@ class NetworkManager {
     
     func buyTicket(eventId: Int, completion: @escaping (Ticket?, Error?) -> Void) {
         let url = "tickets/"
-        let parameters: [String: Any] = ["event_id": eventId]  // <-- именно "event_id"
+        let parameters: [String: Any] = ["event_id": eventId]
         
         session.request(baseURL + url,
                         method: .post,
                         parameters: parameters,
-                        encoding: JSONEncoding.default,  // <-- критично: тело как JSON
+                        encoding: JSONEncoding.default,
                         headers: headers)
-            .validate(statusCode: 200..<300)  // покажет 400/401 явно
+            .validate(statusCode: 200..<300)
             .responseDecodable(of: Ticket.self) { response in
-                // Логируем всё для отладки
+
                 debugPrint("Request URL: \(response.request?.url?.absoluteString ?? "nil")")
                 debugPrint("Request Body: \(String(data: response.request?.httpBody ?? Data(), encoding: .utf8) ?? "nil")")
                 debugPrint("Status Code: \(response.response?.statusCode ?? -1)")

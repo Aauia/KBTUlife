@@ -204,17 +204,15 @@ class EventDetailViewController: UIViewController {
     }
 
     private func formatEventDate(_ dateString: String) -> String {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-
-        guard let date = formatter.date(from: dateString) else { return dateString }
-
-        let displayFormatter = DateFormatter()
-        displayFormatter.dateStyle = .long
-        displayFormatter.timeStyle = .short
-        displayFormatter.locale = Locale.current
-
-        return displayFormatter.string(from: date)
+        guard let date = DateFormatter.inputFormatter.date(from: dateString) else {
+            return NSLocalizedString("unknown_date", comment: "")
+        }
+        
+        let weekday = date.formatted(.dateTime.weekday(.wide)).capitalized
+        let dayMonth = date.formatted(.dateTime.day().month())
+        let time = date.formatted(.dateTime.hour().minute())
+        
+        return "\(weekday), \(dayMonth), \(time)"
     }
 
     private func loadClub(clubId: Int) {
