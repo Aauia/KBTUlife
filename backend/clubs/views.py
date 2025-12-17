@@ -131,4 +131,4 @@ class UserClubsListAPIView(generics.ListAPIView):
         return Club.objects.filter(
             memberships__user_id=user_id,
             memberships__status='accepted'
-        )
+        ).distinct() 
