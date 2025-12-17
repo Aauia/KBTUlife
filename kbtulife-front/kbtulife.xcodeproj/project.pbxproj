@@ -213,7 +213,7 @@
 					};
 				};
 			};
-			buildConfigurationList = DA18F9F72EEC3E7000ECB782 /* Build configuration list for PBXProject "kbtulife-front" */;
+			buildConfigurationList = DA18F9F72EEC3E7000ECB782 /* Build configuration list for PBXProject "kbtulife" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -565,7 +565,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		DA18F9F72EEC3E7000ECB782 /* Build configuration list for PBXProject "kbtulife-front" */ = {
+		DA18F9F72EEC3E7000ECB782 /* Build configuration list for PBXProject "kbtulife" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DA18FA282EEC3E7100ECB782 /* Debug */,
