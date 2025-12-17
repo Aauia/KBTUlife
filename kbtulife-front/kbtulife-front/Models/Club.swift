@@ -32,17 +32,21 @@ struct ClubMember: Codable, Identifiable {
     }
 }
 
-struct Membership: Codable, Identifiable {
+struct Membership: Codable {
     let id: Int
-    let user: String  // User ID
-    let club: Int     // Club ID
     let status: String
-    let requestedAt: String
-    let updatedAt: String
-    
+    let userName: String
+    let userSurname: String
+    let userOutlook: String
+    let clubName: String
+
     enum CodingKeys: String, CodingKey {
-        case id, user, club, status
-        case requestedAt = "requested_at"
-        case updatedAt = "updated_at"
+        case id
+        case status
+        case userName = "user_name"
+        case userSurname = "user_surname"
+        case userOutlook = "user_outlook"
+        case clubName = "club_name"
     }
 }
+

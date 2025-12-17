@@ -1,7 +1,7 @@
 from rest_framework import generics, permissions
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from .models import Club, Membership
-from .serializers import ClubSerializer, MembershipSerializer, MembershipActionSerializer
+from .serializers import ClubSerializer, MembershipSerializer, MembershipActionSerializer , MembershipApplySerializer 
 
 # List all clubs
 class ClubListAPIView(generics.ListAPIView):
@@ -50,6 +50,22 @@ class ClubDeleteAPIView(generics.DestroyAPIView):
 
 
 # Membership 
+# Membership 
+class MembershipApplyView(generics.CreateAPIView):
+    """
+    Apply to a club (authenticated users only)
+    """
+    queryset = Membership.objects.all()
+    serializer_class = MembershipApplySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        club = serializer.validated_data['club']
+        # Prevent duplicate applications
+        if Membership.objects.filter(user=self.request.user, club=club).exists():
+            raise ValidationError("You have already applied to this club.")
+        serializer.save(user=self.request.user, status='pending')
+
 
 class ApplyMembershipAPIView(generics.CreateAPIView):
     queryset = Membership.objects.all()

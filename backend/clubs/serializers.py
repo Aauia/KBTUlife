@@ -23,14 +23,35 @@ class ClubSerializer(serializers.ModelSerializer):
         ]
 
 
+
 class MembershipSerializer(serializers.ModelSerializer):
+    user_name = serializers.CharField(source='user.first_name', read_only=True)
+    user_surname = serializers.CharField(source='user.last_name', read_only=True)
+    user_outlook = serializers.CharField(source='user.outlook', read_only=True)
+    club_name = serializers.CharField(source='club.name', read_only=True)
+
     class Meta:
         model = Membership
-        fields = ['id', 'user', 'club', 'status', 'requested_at', 'updated_at']
-        read_only_fields = ['status', 'requested_at', 'updated_at', 'user']
-
-
+        fields = [
+            'id',
+            'status',
+            'user_name',
+            'user_surname',
+            'user_outlook',
+            'club_name',
+        ]
 class MembershipActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Membership
         fields = ['status']
+        
+class MembershipApplySerializer(serializers.ModelSerializer):
+    club = serializers.PrimaryKeyRelatedField(queryset=Club.objects.all())
+    user_name = serializers.CharField(source='user.first_name', read_only=True)
+    user_surname = serializers.CharField(source='user.last_name', read_only=True)
+    user_outlook = serializers.CharField(source='user.outlook', read_only=True)
+    club_name = serializers.CharField(source='club.name', read_only=True)
+
+    class Meta:
+        model = Membership
+        fields = ['id', 'status', 'user_name', 'user_surname', 'user_outlook', 'club_name', 'club']

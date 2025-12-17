@@ -288,11 +288,41 @@ class NetworkManager {
     func fetchUserClubs(userId: String, completion: @escaping ([Club]?, Error?) -> Void) {
         get(url: "users/\(userId)/clubs/", completion: completion)
     }
-    
-    func applyToClub(clubId: Int, completion: @escaping (Membership?, Error?) -> Void) {
+    func applyToClub(clubId: Int, completion: @escaping (Membership?, String?) -> Void) {
         let parameters: [String: Any] = ["club": clubId]
-        post(url: "clubs/membership/apply/", parameters: parameters, completion: completion)
+        let url = "clubs/membership/apply/"
+        
+        session.request(baseURL + url,
+                        method: .post,
+                        parameters: parameters,
+                        encoding: JSONEncoding.default,
+                        headers: headers)
+            .responseData { response in
+                guard let data = response.data else {
+                    completion(nil, response.error?.localizedDescription ?? "Unknown error")
+                    return
+                }
+                
+                // Try decoding success
+                if let membership = try? JSONDecoder().decode(Membership.self, from: data) {
+                    completion(membership, nil)
+                    return
+                }
+                
+                // Decode error response
+                if let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data) {
+                    // Always return message, but not as "error"
+                    completion(nil, errorResponse.firstError)
+                    return
+                }
+                
+                let text = String(data: data, encoding: .utf8) ?? "Unknown error"
+                completion(nil, text)
+            }
     }
+
+
+
     
     func createClub(name: String, description: String, instagramLink: String?, telegramLink: String?, completion: @escaping (Club?, Error?) -> Void) {
         var parameters: [String: Any] = [
@@ -308,10 +338,179 @@ class NetworkManager {
         post(url: "clubs/create/", parameters: parameters, completion: completion)
     }
     
+    // MARK: - Club Manager Methods
+    
+    /// Check if current user is a club manager (optional optimization endpoint)
+    func checkManagerStatus(completion: @escaping (ClubManagerStatusResponse?, Error?) -> Void) {
+        get(url: "clubmanager/status/", completion: completion)
+    }
+    
+    /// Get list of managers for a specific club
+    func fetchClubManagers(clubId: Int, completion: @escaping ([ClubManager]?, Error?) -> Void) {
+        get(url: "clubmanager/clubs/\(clubId)/managers/", completion: completion)
+    }
+    
+    /// Add a new manager to a club
+    func addClubManager(clubId: Int, userId: String, completion: @escaping (ClubManager?, Error?) -> Void) {
+        let parameters: [String: Any] = ["user": userId]
+        post(url: "clubmanager/clubs/\(clubId)/managers/add/", parameters: parameters, completion: completion)
+    }
+    
+    /// Get pending membership applications for a club
+    /// Get pending membership applications for a club
+    func getPendingMemberships(
+        clubId: Int,
+        completion: @escaping (Result<[Membership], AFError>) -> Void
+    ) {
+        let url = baseURL + "clubmanager/clubs/\(clubId)/membership/pending/"
+
+        session.request(url, headers: headers)
+            .validate()
+            .responseDecodable(of: [Membership].self) { response in
+                if let error = response.error {
+                    print("🔴 Pending memberships error: \(error)")
+                    if let data = response.data,
+                       let str = String(data: data, encoding: .utf8) {
+                        print("📩 Response body: \(str)")
+                    }
+                } else {
+                    print("🟢 Pending memberships loaded")
+                }
+                completion(response.result)
+            }
+    }
+
+    
+    func updateMembershipStatus(
+        clubId: Int,
+        membershipId: Int,
+        status: String,
+        completion: @escaping (Result<Membership, Error>) -> Void
+    ) {
+        let url = baseURL + "clubmanager/clubs/\(clubId)/membership/\(membershipId)/update/"
+        
+        // ✅ ПРОСТОЙ СЛОВАРЬ вместо структуры
+        let parameters: [String: Any] = ["status": status]
+        
+        session.request(
+            url,
+            method: .patch,
+            parameters: parameters,  // ✅ теперь правильно
+            encoding: JSONEncoding.default,
+            headers: headers
+        )
+        .validate()
+        .responseDecodable(of: Membership.self) { response in
+            if let error = response.error {
+                print("🔴 Update error: \(error)")
+                if let data = response.data, let str = String(data: data, encoding: .utf8) {
+                    print("📩 Update response: \(str)")
+                }
+            } else {
+                print("🟢 Update success")
+            }
+            completion(response.result.mapError { $0 as Error })
+        }
+    }
+
+
+    
+    
+    /// Update club details (only for managers)
+    func updateClub(clubId: Int, name: String, description: String, instagramLink: String?, telegramLink: String?, completion: @escaping (Club?, Error?) -> Void) {
+        let url = "clubmanager/clubs/\(clubId)/update/"
+        var parameters: [String: Any] = [
+            "name": name,
+            "description": description
+        ]
+        
+        if let instagram = instagramLink, !instagram.isEmpty {
+            parameters["instagram_link"] = instagram
+        }
+        if let telegram = telegramLink, !telegram.isEmpty {
+            parameters["telegram_link"] = telegram
+        }
+        
+        session.request(baseURL + url,
+                        method: .patch,
+                        parameters: parameters,
+                        encoding: JSONEncoding.default,
+                        headers: headers)
+            .validate(statusCode: 200..<300)
+            .responseDecodable(of: Club.self) { response in
+                switch response.result {
+                case .success(let club):
+                    completion(club, nil)
+                case .failure(let error):
+                    print("Update club error: \(error)")
+                    if let data = response.data,
+                       let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data) {
+                        let customError = NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: errorResponse.firstError])
+                        completion(nil, customError)
+                    } else {
+                        completion(nil, error)
+                    }
+                }
+            }
+    }
+    
+    /// Delete club (only for managers)
+    func deleteClub(clubId: Int, completion: @escaping (Bool, Error?) -> Void) {
+        let url = "clubmanager/clubs/\(clubId)/delete/"
+        
+        session.request(baseURL + url, method: .delete, headers: headers)
+            .validate(statusCode: 200..<300)
+            .response { response in
+                switch response.result {
+                case .success:
+                    completion(true, nil)
+                case .failure(let error):
+                    print("Delete club error: \(error)")
+                    completion(false, error)
+                }
+            }
+    }
+    
     // MARK: - Supporting Structs
     struct ValidateQRResponse: Codable {
         let status: String
         let ticket: Ticket?
         let message: String?
     }
+    // В NetworkManager.swift добавь:
+    func fetchProfileData(completion: @escaping ([Ticket]?, User?, Error?) -> Void) {
+        let group = DispatchGroup()
+        var tickets: [Ticket]? = nil
+        var user: User? = nil
+        var error: Error? = nil
+        
+        group.enter()
+        fetchMyTickets { fetchedTickets, fetchError in
+            if let fetchedTickets = fetchedTickets {
+                tickets = fetchedTickets
+            } else {
+                error = fetchError
+            }
+            group.leave()
+        }
+        
+        group.enter()
+        fetchCurrentUser { fetchedUser, fetchError in
+            if let fetchedUser = fetchedUser {
+                user = fetchedUser
+            } else {
+                error = fetchError
+            }
+            group.leave()
+        }
+        
+        group.notify(queue: .main) {
+            if let error = error {
+                completion(nil, nil, error)
+            } else {
+                completion(tickets, user, nil)
+            }
+        }
+    }
+
 }

@@ -1,5 +1,5 @@
 import UIKit
-
+import Alamofire
 class ClubCell: UITableViewCell {
     
     private let cardView = UIView()
@@ -202,27 +202,39 @@ class ClubCell: UITableViewCell {
         guard let urlString = club?.instagramLink, let url = URL(string: urlString) else { return }
         UIApplication.shared.open(url)
     }
-    
     @objc private func applyTapped() {
         guard let club = club else { return }
         
         applyButton.isEnabled = false
         applyButton.configuration?.showsActivityIndicator = true
         
-        NetworkManager.shared.applyToClub(clubId: club.id) { [weak self] membership, error in
+        NetworkManager.shared.applyToClub(clubId: club.id) { [weak self] membership, message in
             DispatchQueue.main.async {
                 self?.applyButton.isEnabled = true
                 self?.applyButton.configuration?.showsActivityIndicator = false
                 
-                if membership != nil {
+                if let _ = membership {
                     self?.showSuccessAlert()
+                } else if let message = message {
+                    self?.showInfoAlert(message: message) // <-- info alert instead of error
                 } else {
-                    let message = error?.localizedDescription ?? ""
-                    self?.showErrorAlert(message: message)
+                    self?.showInfoAlert(message: "Unknown status")
                 }
             }
         }
     }
+    private func showInfoAlert(message: String) {
+        guard let viewController = self.findViewController() else { return }
+        let alert = UIAlertController(
+            title: NSLocalizedString("club_apply_info_title", comment: ""),
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        viewController.present(alert, animated: true)
+    }
+
+
     
     private func showSuccessAlert() {
         guard let viewController = self.findViewController() else { return }

@@ -1,3 +1,4 @@
+// Updated ProfileViewController.swift
 import UIKit
 
 final class ProfileViewController: UIViewController {
@@ -29,6 +30,17 @@ final class ProfileViewController: UIViewController {
     private let logoutButton = UIButton(type: .system)
     
     private let languageSegment = UISegmentedControl(items: ["Русский", "Қазақша", "English"])
+    
+    private var userTickets: [Ticket] = []
+    private var userBadges: [Badge] = []
+    private var attendedEventsCount = 0
+    private var unlockedBadgesCount = 0
+    private var joinedClubsCount = 0
+    
+    // MARK: - Properties
+    private var currentUser: User?
+    private var isManager = false
+    private var managedClubs: [ManagedClub] = []
     
     // MARK: - Lifecycle
     
@@ -210,9 +222,12 @@ final class ProfileViewController: UIViewController {
         menuStack.addArrangedSubview(menuLabel(NSLocalizedString("event_history", comment: "")))
         menuStack.addArrangedSubview(menuLabel(NSLocalizedString("my_reviews", comment: "")))
         
+        // Admin Dashboard Button
         adminButton.setTitle(NSLocalizedString("admin_dashboard", comment: ""), for: .normal)
-        adminButton.backgroundColor = UIColor.systemGray5
+        adminButton.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.15)
+        adminButton.setTitleColor(.systemBlue, for: .normal)
         adminButton.layer.cornerRadius = 14
+        adminButton.addTarget(self, action: #selector(handleAdminDashboard), for: .touchUpInside)
         
         logoutButton.setTitle(NSLocalizedString("logout", comment: ""), for: .normal)
         logoutButton.backgroundColor = UIColor.systemRed.withAlphaComponent(0.15)
@@ -353,15 +368,52 @@ final class ProfileViewController: UIViewController {
     private func fetchProfile() {
         NetworkManager.shared.fetchCurrentUser { [weak self] user, _ in
             guard let user = user else { return }
+            self?.currentUser = user
+            
             DispatchQueue.main.async {
                 self?.nameLabel.text = "\(user.firstName) \(user.lastName)"
                 self?.emailLabel.text = user.outlook
                 self?.avatarLabel.text = String(user.firstName.prefix(1))
+                
+                // Store user ID for later use
+                UserDefaults.standard.set(user.id, forKey: "userId")
+            }
+            
+            // Check if user is a manager
+            self?.checkManagerStatus()
+        }
+    }
+    
+    private func checkManagerStatus() {
+        NetworkManager.shared.checkManagerStatus { [weak self] response, error in
+            guard let self, let response else { return }
+            
+            DispatchQueue.main.async {
+                self.isManager = response.isManager
+                self.managedClubs = response.managedClubs
+                self.adminButton.isHidden = !response.isManager
             }
         }
     }
     
+    
     // MARK: - Actions
+    @objc private func handleAdminDashboard() {
+        guard isManager else {
+            showAlert(
+                title: NSLocalizedString("access_denied", comment: ""),
+                message: NSLocalizedString("not_club_manager_message", comment: "")
+            )
+            return
+        }
+        
+        let dashboardVC = ClubManagerViewController()
+        dashboardVC.managedClubs = managedClubs   // 🔑 inject data
+        dashboardVC.modalPresentationStyle = .fullScreen
+        present(dashboardVC, animated: true)
+    }
+    
+    
     
     @objc private func handleLogout() {
         NetworkManager.shared.logout { [weak self] success, error in
@@ -369,17 +421,52 @@ final class ProfileViewController: UIViewController {
                 guard let self = self else { return }
                 
                 if success {
-                    self.dismiss(animated: true)
+                    self.showInfoAlert(
+                        title: NSLocalizedString("logout_success_title", comment: ""),
+                        message: NSLocalizedString("logout_success_message", comment: "")
+                    ) {
+                        // Navigate to onboarding after alert dismissed
+                        self.navigateToOnboarding()
+                    }
                 } else {
-                    let alert = UIAlertController(
+                    self.showAlert(
                         title: NSLocalizedString("logout_failed_title", comment: ""),
-                        message: error?.localizedDescription ?? NSLocalizedString("logout_failed_message", comment: ""),
-                        preferredStyle: .alert
+                        message: error?.localizedDescription ?? NSLocalizedString("logout_failed_message", comment: "")
                     )
-                    alert.addAction(UIAlertAction(title: "OK", style: .default))
-                    self.present(alert, animated: true)
                 }
             }
         }
     }
+    
+    
+    private func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+    private func showInfoAlert(title: String, message: String, completion: (() -> Void)? = nil) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+            completion?()
+        })
+        present(alert, animated: true)
+    }
+    // ✅ Add here
+    private func navigateToOnboarding() {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let sceneDelegate = windowScene.delegate as? UIWindowSceneDelegate,
+              let window = sceneDelegate.window ?? nil else {
+            return
+        }
+
+        let onboardingVC = OnboardingViewController()
+        let navController = UINavigationController(rootViewController: onboardingVC) // Optional, if you want navigation
+
+        // Smooth crossfade animation
+        UIView.transition(with: window, duration: 0.4, options: .transitionCrossDissolve) {
+            window.rootViewController = navController
+            window.makeKeyAndVisible()
+        }
+    }
+
 }

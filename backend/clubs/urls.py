@@ -10,7 +10,8 @@ from .views import (
     ClubUpdateAPIView,
     ClubDeleteAPIView,
     ClubMembersListAPIView,
-    UserClubsListAPIView
+    UserClubsListAPIView,
+    MembershipApplyView
 )
 
 urlpatterns = [
@@ -25,7 +26,7 @@ urlpatterns = [
 
 
     # Membership endpoints
-    path('membership/apply/', ApplyMembershipAPIView.as_view(), name='apply_membership'),  # User applies
+    path('membership/apply/', MembershipApplyView.as_view(), name='apply_membership'),  # User applies
     #path('membership/pending/', PendingMembershipListAPIView.as_view(), name='pending_memberships'), # Manager sees pending
     #path('membership/<int:pk>/update/', UpdateMembershipStatusAPIView.as_view(), name='update_membership'), # Manager updates status
     
