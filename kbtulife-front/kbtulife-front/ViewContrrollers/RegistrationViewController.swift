@@ -60,7 +60,7 @@ class RegistrationViewController: UIViewController {
         
         // Register Button
         registerButton.setTitle("Зарегистрироваться", for: .normal)
-        registerButton.backgroundColor = .systemBlue
+        registerButton.backgroundColor = UIColor(red: 25/255, green: 45/255, blue: 85/255, alpha: 1.0)
         registerButton.setTitleColor(.white, for: .normal)
         registerButton.layer.cornerRadius = 12
         registerButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)

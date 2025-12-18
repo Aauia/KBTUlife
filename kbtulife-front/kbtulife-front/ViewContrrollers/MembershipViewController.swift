@@ -85,13 +85,13 @@ extension MembershipViewController: UITableViewDataSource {
         let membership = memberships[indexPath.row]
         cell.configure(with: membership)
 
-        // ✅ раскомментируй когда готово
-        cell.onAccept = { [weak self] in
-            self?.updateStatus(at: indexPath.row, status: "accepted")
-        }
-        cell.onReject = { [weak self] in
-            self?.updateStatus(at: indexPath.row, status: "rejected")
-        }
+ 
+       /// cell.onAccept = { [weak self] in
+           // self?.updateStatus(at: indexPath.row, status: "accepted")
+       // }
+       // cell.onReject = { [weak self] in
+       //     self?.updateStatus(at: indexPath.row, status: "rejected")
+       // }
 
         return cell
     }

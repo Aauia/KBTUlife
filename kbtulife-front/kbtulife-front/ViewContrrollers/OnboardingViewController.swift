@@ -234,7 +234,7 @@ final class OnboardingViewController: UIViewController {
     }
     
     private func completeOnboarding() {
-        let loginVC = LoginViewController()
+        let loginVC = WelcomeViewController()
         let nav = UINavigationController(rootViewController: loginVC)
         UIApplication.shared.windows.first?.rootViewController = nav
         UIApplication.shared.windows.first?.makeKeyAndVisible()

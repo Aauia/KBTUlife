@@ -30,7 +30,7 @@ class LoginViewController: UIViewController {
         
         // Login Button
         loginButton.setTitle("Войти", for: .normal)
-        loginButton.backgroundColor = .systemBlue
+        loginButton.backgroundColor = UIColor(red: 25/255, green: 45/255, blue: 85/255, alpha: 1.0)
         loginButton.setTitleColor(.white, for: .normal)
         loginButton.layer.cornerRadius = 12
         loginButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
