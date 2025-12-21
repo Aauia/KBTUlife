@@ -286,7 +286,7 @@ class NetworkManager {
     }
     
     func fetchUserClubs(userId: String, completion: @escaping ([Club]?, Error?) -> Void) {
-        get(url: "users/\(userId)/clubs/", completion: completion)
+        get(url: "clubs/users/\(userId)/clubs/", completion: completion)
     }
     func applyToClub(clubId: Int, completion: @escaping (Membership?, String?) -> Void) {
         let parameters: [String: Any] = ["club": clubId]

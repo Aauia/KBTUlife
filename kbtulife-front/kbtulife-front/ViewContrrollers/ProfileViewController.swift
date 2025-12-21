@@ -52,7 +52,7 @@ final class ProfileViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         setupUI()
-        fetchProfile()
+        fetchAllData()
     }
     
 
@@ -512,77 +512,95 @@ final class ProfileViewController: UIViewController {
         }
     }
 
-    private func fetchProfile() {
-        NetworkManager.shared.fetchCurrentUser { [weak self] user, _ in
-            guard let user = user else { return }
-            self?.currentUser = user
-            
-            DispatchQueue.main.async {
-                self?.nameLabel.text = "\(user.firstName) \(user.lastName)"
-                self?.emailLabel.text = user.outlook
-                self?.avatarLabel.text = String(user.firstName.prefix(1))
-                
-                UserDefaults.standard.set(user.id, forKey: "userId")
+    
+    private func fetchAllData() {
+        let group = DispatchGroup()
+        var user: User?
+        var tickets: [Ticket]?
+        var managerStatus: ClubManagerStatusResponse?
+        var userClubs: [Club]?
+        
+        group.enter()
+        NetworkManager.shared.fetchCurrentUser { fetchedUser, error in
+            if let fetchedUser = fetchedUser {
+                user = fetchedUser
+                group.enter()
+                NetworkManager.shared.fetchUserClubs(userId: fetchedUser.id) { fetchedClubs, error in
+                    userClubs = fetchedClubs
+                    group.leave()
+                }
             }
+            group.leave()
+        }
+        
+        group.enter()
+        NetworkManager.shared.fetchMyTickets { fetchedTickets, error in
+            tickets = fetchedTickets
+            group.leave()
+        }
+        
+        group.enter()
+        NetworkManager.shared.checkManagerStatus { status, error in
+            managerStatus = status
+            group.leave()
+        }
+        
+        group.notify(queue: .main) { [weak self] in
+            guard let self = self else { return }
             
-            self?.checkManagerStatus()
-            self?.currentUserId = user.id
+            self.currentUser = user
+            self.userTickets = tickets ?? []
+            self.isManager = managerStatus?.isManager ?? false
+            self.managedClubs = managerStatus?.managedClubs ?? []
+            self.clubs = userClubs ?? []
+            
+            self.updateUI()
+        }
+    }
+    
+    private func updateUI() {
+        if let user = currentUser {
+            nameLabel.text = "\(user.firstName) \(user.lastName)"
+            emailLabel.text = user.outlook
+            avatarLabel.text = String(user.firstName.prefix(1))
             UserDefaults.standard.set(user.id, forKey: "userId")
+            currentUserId = user.id
         }
+        
+        attendedEventsCount = userTickets.filter { $0.used }.count
+        updateStatsCard(at: 0, with: "\(attendedEventsCount)")
+        
+        joinedClubsCount = clubs.count
+        updateStatsCard(at: 1, with: "\(joinedClubsCount)")
+        adminButton.isHidden = !isManager
+        
+        populateMyClubsStack()
     }
     
-    private func checkManagerStatus() {
-        NetworkManager.shared.checkManagerStatus { [weak self] response, error in
-            guard let self, let response else { return }
-            
-            DispatchQueue.main.async {
-                self.isManager = response.isManager
-                self.managedClubs = response.managedClubs
-                self.adminButton.isHidden = !response.isManager
-            }
+    private func populateMyClubsStack() {
+        myClubsListStack.arrangedSubviews.forEach {
+            self.myClubsListStack.removeArrangedSubview($0)
+            $0.removeFromSuperview()
         }
-    }
-    
-    private func loadMyClubsInline() {
-        NetworkManager.shared.fetchUserClubs(userId: currentUserId) { [weak self] clubs, _ in
-            DispatchQueue.main.async {
-                guard let self = self else { return }
-                
-                self.myClubsListStack.arrangedSubviews.forEach {
-                    self.myClubsListStack.removeArrangedSubview($0)
-                    $0.removeFromSuperview()
-                }
-                
-                guard let clubs = clubs, !clubs.isEmpty else {
-                    let emptyLabel = UILabel()
-                    emptyLabel.text = NSLocalizedString("no_clubs", comment: "No clubs yet")
-                    emptyLabel.font = .systemFont(ofSize: 15)
-                    emptyLabel.textColor = .secondaryLabel
-                    emptyLabel.textAlignment = .center
-                    self.myClubsListStack.addArrangedSubview(emptyLabel)
-                    return
-                }
-                
-                self.clubs = clubs
-                self.joinedClubsCount = clubs.count
-                self.updateStatsCard(at: 1, with: "\(self.joinedClubsCount)")
-                
-                clubs.forEach { club in
-                    let clubRow = self.createClubRow(for: club)
-                    self.myClubsListStack.addArrangedSubview(clubRow)
-                }
-            }
+        
+        guard !clubs.isEmpty else {
+            let emptyLabel = UILabel()
+            emptyLabel.text = NSLocalizedString("no_clubs", comment: "No clubs yet")
+            emptyLabel.font = .systemFont(ofSize: 15)
+            emptyLabel.textColor = .secondaryLabel
+            emptyLabel.textAlignment = .center
+            myClubsListStack.addArrangedSubview(emptyLabel)
+            return
+        }
+        
+        clubs.forEach { club in
+            let clubRow = self.createClubRow(for: club)
+            myClubsListStack.addArrangedSubview(clubRow)
         }
     }
 
     @objc private func toggleMyClubs() {
-        guard !currentUserId.isEmpty else {
-            print("User ID not loaded yet")
-            return
-        }
-        
         isMyClubsExpanded.toggle()
-        myClubsListStack.isHidden = !isMyClubsExpanded
         
         if let chevron = myClubsSection.viewWithTag(999) {
             UIView.animate(withDuration: 0.3) {
@@ -591,11 +609,8 @@ final class ProfileViewController: UIViewController {
         }
         
         UIView.animate(withDuration: 0.3) {
+            self.myClubsListStack.isHidden = !self.isMyClubsExpanded
             self.view.layoutIfNeeded()
-        }
-        
-        if isMyClubsExpanded && clubs.isEmpty {
-            loadMyClubsInline()
         }
     }
     
@@ -685,3 +700,4 @@ final class ProfileViewController: UIViewController {
         }
     }
 }
+
