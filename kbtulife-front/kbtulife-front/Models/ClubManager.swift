@@ -1,7 +1,6 @@
-// ClubManagerModels.swift
+
 import Foundation
 
-// MARK: - Club Manager
 struct ClubManager: Codable {
     let id: Int
     let club: Int
@@ -17,17 +16,11 @@ struct ClubManager: Codable {
     }
 }
 
-// MARK: - Membership
-//struct MembershipStatusUpdate: Encodable {
-  //  let status: String
-//}
-
-// MARK: - Membership Action Request
 struct MembershipActionRequest: Codable {
-    let status: String // "accepted" or "declined"
+    let status: String
 }
 
-// MARK: - Club Manager Status Response
+
 struct ClubManagerStatusResponse: Codable {
     let isManager: Bool
     let managedClubs: [ManagedClub]

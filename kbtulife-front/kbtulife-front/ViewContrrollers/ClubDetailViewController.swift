@@ -8,12 +8,12 @@ class ClubDetailViewController: UIViewController {
     private let scrollView = UIScrollView()
     private let contentView = UIView()
     
-    // Header
+   
     private let headerView = UIView()
     private let logoLabel = UILabel()
     private let gradientLayer = CAGradientLayer()
     
-    // Card
+
     private let cardView = UIView()
     
     private let nameLabel = UILabel()
@@ -28,7 +28,7 @@ class ClubDetailViewController: UIViewController {
     
     private let membersPreviewStack = UIStackView()
     
-    // Bottom bar
+  
     private let bottomBar = UIView()
     private let applyButton = UIButton(type: .system)
     
@@ -78,7 +78,7 @@ class ClubDetailViewController: UIViewController {
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
         ])
         
-        // Header
+    
         headerView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(headerView)
         
@@ -103,7 +103,7 @@ class ClubDetailViewController: UIViewController {
             logoLabel.centerYAnchor.constraint(equalTo: headerView.centerYAnchor)
         ])
         
-        // Card
+    
         cardView.backgroundColor = .white
         cardView.layer.cornerRadius = 32
         cardView.translatesAutoresizingMaskIntoConstraints = false

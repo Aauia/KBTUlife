@@ -92,7 +92,7 @@ class ClubsViewController: UIViewController {
     }
 }
 
-// MARK: - TableView DataSource
+
 extension ClubsViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return clubs.count

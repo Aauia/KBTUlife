@@ -59,7 +59,7 @@ class QRScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsD
                     let message = String(format: NSLocalizedString("ticket_valid_message", comment: ""), ticket.event.name, email)
                     let alert = UIAlertController(title: NSLocalizedString("ticket_valid_title", comment: ""), message: message, preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: NSLocalizedString("mark_used_button", comment: ""), style: .destructive) { _ in
-                        // Здесь вызов mark-as-used
+       
                     })
                     alert.addAction(UIAlertAction(title: NSLocalizedString("cancel_button", comment: ""), style: .cancel) { _ in
                         self?.captureSession.startRunning()

@@ -3,8 +3,8 @@ struct Badge {
     let id: String
     let title: String
     let description: String
-    let icon: String      // e.g. "🥇"
-    let category: String  // "general", "sports", "tech"
+    let icon: String  
+    let category: String
     let requiredCount: Int
     let currentCount: Int
 

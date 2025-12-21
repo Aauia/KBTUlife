@@ -86,12 +86,6 @@ extension MembershipViewController: UITableViewDataSource {
         cell.configure(with: membership)
 
  
-       /// cell.onAccept = { [weak self] in
-           // self?.updateStatus(at: indexPath.row, status: "accepted")
-       // }
-       // cell.onReject = { [weak self] in
-       //     self?.updateStatus(at: indexPath.row, status: "rejected")
-       // }
 
         return cell
     }

@@ -3,7 +3,7 @@ import UIKit
 
 class RegistrationViewController: UIViewController {
     
-    // MARK: - UI Components
+  
     private let scrollView = UIScrollView()
     private let contentView = UIView()
     
@@ -18,7 +18,7 @@ class RegistrationViewController: UIViewController {
     private let activityIndicator = UIActivityIndicatorView(style: .medium)
     private let loginButton = UIButton(type: .system)
     
-    // MARK: - Lifecycle
+
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Регистрация"
@@ -28,7 +28,7 @@ class RegistrationViewController: UIViewController {
         setupKeyboardHandling()
     }
     
-    // MARK: - Setup UI
+    
     private func setupUI() {
         // Scroll View
         view.addSubview(scrollView)
@@ -50,7 +50,7 @@ class RegistrationViewController: UIViewController {
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
         ])
         
-        // Configure TextFields
+        
         configureTextField(outlookTextField, placeholder: "Email (@kbtu.kz)", keyboardType: .emailAddress)
         configureTextField(firstNameTextField, placeholder: "Имя")
         configureTextField(lastNameTextField, placeholder: "Фамилия")
@@ -58,7 +58,7 @@ class RegistrationViewController: UIViewController {
         configureTextField(passwordTextField, placeholder: "Пароль", isSecure: true)
         configureTextField(confirmPasswordTextField, placeholder: "Подтвердите пароль", isSecure: true)
         
-        // Register Button
+
         registerButton.setTitle("Зарегистрироваться", for: .normal)
         registerButton.backgroundColor = UIColor(red: 25/255, green: 45/255, blue: 85/255, alpha: 1.0)
         registerButton.setTitleColor(.white, for: .normal)
@@ -66,15 +66,15 @@ class RegistrationViewController: UIViewController {
         registerButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
         registerButton.addTarget(self, action: #selector(registerTapped), for: .touchUpInside)
         
-        // Activity Indicator
+
         activityIndicator.hidesWhenStopped = true
         
-        // Login Button
+
         loginButton.setTitle("Уже есть аккаунт? Войти", for: .normal)
         loginButton.titleLabel?.font = .systemFont(ofSize: 15)
         loginButton.addTarget(self, action: #selector(goToLogin), for: .touchUpInside)
         
-        // Stack View
+
         let stack = UIStackView(arrangedSubviews: [
             outlookTextField,
             firstNameTextField,
@@ -100,7 +100,7 @@ class RegistrationViewController: UIViewController {
             stack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -40)
         ])
         
-        // Heights
+ 
         [outlookTextField, firstNameTextField, lastNameTextField,
          phoneTextField, passwordTextField, confirmPasswordTextField, registerButton].forEach {
             $0.heightAnchor.constraint(equalToConstant: 50).isActive = true
@@ -115,14 +115,14 @@ class RegistrationViewController: UIViewController {
         textField.isSecureTextEntry = isSecure
         textField.font = .systemFont(ofSize: 16)
         
-        // Add padding
+ 
         textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 50))
         textField.leftViewMode = .always
     }
     
-    // MARK: - Actions
+   
     @objc private func registerTapped() {
-        // Validate inputs
+
         guard let outlook = outlookTextField.text?.trimmingCharacters(in: .whitespaces), !outlook.isEmpty else {
             showAlert(title: "Ошибка", message: "Введите email")
             return
@@ -160,7 +160,7 @@ class RegistrationViewController: UIViewController {
         
         let phone = phoneTextField.text?.trimmingCharacters(in: .whitespaces)
         
-        // Start registration
+    
         registerButton.isEnabled = false
         registerButton.setTitle("", for: .normal)
         activityIndicator.startAnimating()
@@ -181,7 +181,7 @@ class RegistrationViewController: UIViewController {
                 if let user = user {
                     print("✅ Registration successful: \(user.firstName) \(user.lastName)")
                     
-                    // Show success and navigate
+              
                     self?.showSuccessAndNavigate()
                 } else {
                     let message = self?.parseError(error) ?? "Произошла ошибка. Попробуйте снова."
@@ -195,7 +195,7 @@ class RegistrationViewController: UIViewController {
         navigationController?.popViewController(animated: true)
     }
     
-    // MARK: - Helper Methods
+
     private func showSuccessAndNavigate() {
         let alert = UIAlertController(
             title: "Успех! 🎉",
@@ -203,7 +203,6 @@ class RegistrationViewController: UIViewController {
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Продолжить", style: .default) { [weak self] _ in
-            // Navigate to main app
             let mainTab = MainTabBarController()
             if let window = UIApplication.shared.windows.first {
                 window.rootViewController = mainTab
@@ -224,7 +223,7 @@ class RegistrationViewController: UIViewController {
         
         let errorMessage = error.localizedDescription
         
-        // Parse common Django errors
+    
         if errorMessage.contains("outlook") || errorMessage.contains("already exists") {
             return "Этот email уже зарегистрирован"
         } else if errorMessage.contains("password") {
@@ -235,8 +234,7 @@ class RegistrationViewController: UIViewController {
         
         return "Ошибка сервера. Попробуйте позже."
     }
-    
-    // MARK: - Keyboard Handling
+
     private func setupKeyboardHandling() {
         NotificationCenter.default.addObserver(
             self,
@@ -251,7 +249,7 @@ class RegistrationViewController: UIViewController {
             object: nil
         )
         
-        // Tap to dismiss keyboard
+      
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tapGesture)
     }

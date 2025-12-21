@@ -2,7 +2,7 @@ import UIKit
 
 class AdminDashboardViewController: UIViewController {
     private let tableView = UITableView()
-    private var pendingUsers: [String] = ["user1@kbtu.kz", "user2@kbtu.kz"]  // заглушка
+    private var pendingUsers: [String] = ["user1@kbtu.kz", "user2@kbtu.kz"]  
     
     override func viewDidLoad() {
         super.viewDidLoad()

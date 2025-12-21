@@ -17,18 +17,18 @@ class LoginViewController: UIViewController {
     }
     
     private func setupUI() {
-        // Outlook TextField
+
         outlookTextField.placeholder = "Outlook email (@kbtu.kz)"
         outlookTextField.keyboardType = .emailAddress
         outlookTextField.autocapitalizationType = .none
         outlookTextField.borderStyle = .roundedRect
         
-        // Password TextField
+
         passwordTextField.placeholder = "Пароль"
         passwordTextField.isSecureTextEntry = true
         passwordTextField.borderStyle = .roundedRect
         
-        // Login Button
+  
         loginButton.setTitle("Войти", for: .normal)
         loginButton.backgroundColor = UIColor(red: 25/255, green: 45/255, blue: 85/255, alpha: 1.0)
         loginButton.setTitleColor(.white, for: .normal)
@@ -36,22 +36,22 @@ class LoginViewController: UIViewController {
         loginButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
         loginButton.addTarget(self, action: #selector(loginTapped), for: .touchUpInside)
         
-        // Activity Indicator
+
         activityIndicator.hidesWhenStopped = true
         
-        // Register Button ✅
+       
         registerButton.setTitle("Нет аккаунта? Зарегистрироваться", for: .normal)
         registerButton.titleLabel?.font = .systemFont(ofSize: 15)
         registerButton.setTitleColor(.systemBlue, for: .normal)
         registerButton.addTarget(self, action: #selector(registerTapped), for: .touchUpInside)
         
-        // Stack View - Added registerButton ✅
+
         let stack = UIStackView(arrangedSubviews: [
             outlookTextField,
             passwordTextField,
             loginButton,
             activityIndicator,
-            registerButton  // ✅ Added to stack
+            registerButton
         ])
         stack.axis = .vertical
         stack.spacing = 20
@@ -104,7 +104,7 @@ class LoginViewController: UIViewController {
         }
     }
     
-    // ✅ New method for registration
+
     @objc private func registerTapped() {
         let registerVC = RegistrationViewController()
         navigationController?.pushViewController(registerVC, animated: true)

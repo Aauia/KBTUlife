@@ -17,11 +17,11 @@ struct User: Codable {
     }
 }
 
-// ✅ FIXED: Made message optional to handle error responses
+
 struct LoginResponse: Codable {
-    let message: String?  // Made optional
-    let user: User?       // Made optional for error cases
-    let sessionid: String?  // Made optional
+    let message: String?
+    let user: User?
+    let sessionid: String?
     
     // For error responses
     let detail: String?
@@ -29,13 +29,12 @@ struct LoginResponse: Codable {
     let password: [String]?
 }
 
-// ✅ FIXED: Made message optional to handle error responses
 struct RegisterResponse: Codable {
-    let message: String?  // Made optional
-    let user: User?       // Made optional for error cases
-    let sessionid: String?  // Made optional
+    let message: String?
+    let user: User?
+    let sessionid: String?
     
-    // For error responses
+
     let detail: String?
     let outlook: [String]?
     let password: [String]?
@@ -44,20 +43,15 @@ struct RegisterResponse: Codable {
     let phone: [String]?
 }
 
-// ✅ NEW: Generic error response handler
+
 struct ErrorResponse: Codable {
     let detail: String?
     
-    // Catch-all for field errors
     private let container: [String: [String]]
     
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
-        
-        // Try to decode detail
         detail = try? container.decodeIfPresent(String.self, forKey: DynamicCodingKeys(stringValue: "detail")!)
-        
-        // Decode all other keys as string arrays
         var errors: [String: [String]] = [:]
         for key in container.allKeys {
             if key.stringValue != "detail" {
@@ -69,13 +63,12 @@ struct ErrorResponse: Codable {
         self.container = errors
     }
     
-    // Get first error message
     var firstError: String {
         if let detail = detail {
             return detail
         }
         
-        // Return first field error
+   
         for (field, messages) in container {
             if let first = messages.first {
                 return "\(field): \(first)"

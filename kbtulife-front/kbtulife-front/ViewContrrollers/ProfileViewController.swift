@@ -2,7 +2,7 @@ import UIKit
 
 final class ProfileViewController: UIViewController {
     
-    // MARK: - UI Components
+
     private let scrollView = UIScrollView()
     private let contentView = UIView()
     
@@ -34,7 +34,7 @@ final class ProfileViewController: UIViewController {
     
     private let languageSegment = UISegmentedControl(items: ["Русский", "Қазақша", "English"])
     
-    // MARK: - Properties
+
     private var userTickets: [Ticket] = []
     private var userBadges: [Badge] = []
     private var attendedEventsCount = 0
@@ -47,7 +47,7 @@ final class ProfileViewController: UIViewController {
     private var clubs: [Club] = []
     private var currentUserId: String = UserDefaults.standard.string(forKey: "userId") ?? ""
     
-    // MARK: - Lifecycle
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -55,7 +55,7 @@ final class ProfileViewController: UIViewController {
         fetchProfile()
     }
     
-    // MARK: - Setup UI
+
     private func setupUI() {
         setupScroll()
         setupHeader()
@@ -511,8 +511,7 @@ final class ProfileViewController: UIViewController {
         default: return 2
         }
     }
-    
-    // MARK: - Data Loading
+
     private func fetchProfile() {
         NetworkManager.shared.fetchCurrentUser { [weak self] user, _ in
             guard let user = user else { return }
@@ -575,8 +574,7 @@ final class ProfileViewController: UIViewController {
             }
         }
     }
-    
-    // MARK: - Actions
+
     @objc private func toggleMyClubs() {
         guard !currentUserId.isEmpty else {
             print("User ID not loaded yet")

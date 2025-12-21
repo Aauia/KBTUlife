@@ -19,25 +19,25 @@ class AchievementCardView: UIView {
         layer.shadowOffset = CGSize(width: 0, height: 2)
         layer.shadowRadius = 8
         
-        // Icon
+
         iconLabel.font = UIFont.systemFont(ofSize: 32)
         iconLabel.text = badge.icon
         iconLabel.textAlignment = .center
         iconLabel.textColor = badge.isUnlocked ? .systemBlue : .systemGray3
         
-        // Title
+
         titleLabel.font = UIFont.systemFont(ofSize: 11, weight: .medium)
         titleLabel.textColor = .label
         titleLabel.numberOfLines = 1
         titleLabel.text = badge.title
         
-        // Description
+     
         descLabel.font = UIFont.systemFont(ofSize: 10)
         descLabel.textColor = .secondaryLabel
         descLabel.numberOfLines = 2
         descLabel.text = badge.description
         
-        // Progress
+      
         progressView.progressTintColor = .systemBlue
         progressView.trackTintColor = UIColor.systemGray5
         progressView.progress = Float(badge.progress)

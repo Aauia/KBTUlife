@@ -1,6 +1,6 @@
 import UIKit
 
-// MARK: - Tab Sections
+
 enum ClubManagerTab: Int, CaseIterable {
     case memberships = 0
     case tickets = 1
@@ -19,14 +19,13 @@ enum ClubManagerTab: Int, CaseIterable {
 
 class ClubManagerViewController: UIViewController {
     
-    // MARK: - Properties
     var managedClubs: [ManagedClub] = []
     private var selectedClubId: Int?
     private var selectedTab: ClubManagerTab = .memberships
     private var currentContentVC: UIViewController?
     private var emptyStateView: UIView!
     
-    // MARK: - UI Components
+
     private lazy var headerView = UIView()
     private lazy var titleLabel = UILabel()
     private lazy var clubPickerButton = UIButton(type: .system)
@@ -59,7 +58,7 @@ class ClubManagerViewController: UIViewController {
     private lazy var contentContainer = UIView()
     private lazy var activityIndicator = UIActivityIndicatorView(style: .large)
     
-    // MARK: - Lifecycle
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -71,7 +70,7 @@ class ClubManagerViewController: UIViewController {
         loadManagerStatus()
     }
     
-    // MARK: - Setup UI
+
     private func setupUI() {
         view.backgroundColor = .systemBackground
         navigationItem.title = "Club Manager"
@@ -79,7 +78,7 @@ class ClubManagerViewController: UIViewController {
         setupHeader()
         setupEmptyState()
         
-        // ScrollView + Tabs + Content
+
         view.addSubview(scrollView)
         scrollView.addSubview(tabContainer)
         tabContainer.addSubview(tabStackView)
@@ -87,32 +86,32 @@ class ClubManagerViewController: UIViewController {
         view.addSubview(activityIndicator)
         
         NSLayoutConstraint.activate([
-            // ScrollView
+
             scrollView.topAnchor.constraint(equalTo: headerView.bottomAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
-            // Tab Container
+
             tabContainer.topAnchor.constraint(equalTo: scrollView.topAnchor),
             tabContainer.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             tabContainer.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             tabContainer.heightAnchor.constraint(equalToConstant: 50),
             
-            // Tab StackView
+  
             tabStackView.topAnchor.constraint(equalTo: tabContainer.topAnchor, constant: 8),
             tabStackView.leadingAnchor.constraint(equalTo: tabContainer.leadingAnchor, constant: 16),
             tabStackView.trailingAnchor.constraint(equalTo: tabContainer.trailingAnchor, constant: -16),
             tabStackView.bottomAnchor.constraint(equalTo: tabContainer.bottomAnchor, constant: -8),
             
-            // Content Container
+        
             contentContainer.topAnchor.constraint(equalTo: tabContainer.bottomAnchor),
             contentContainer.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             contentContainer.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             contentContainer.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentContainer.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
             
-            // Activity Indicator
+       
             activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
@@ -220,7 +219,7 @@ class ClubManagerViewController: UIViewController {
         }
     }
     
-    // MARK: - Actions
+
     @objc private func tabTapped(_ sender: UIButton) {
         tabStackView.arrangedSubviews.forEach {
             ($0 as! UIButton).isSelected = false
@@ -258,11 +257,10 @@ class ClubManagerViewController: UIViewController {
         }
     }
     
-    // MARK: - Content Management
     private func updateContent() {
         guard let clubId = selectedClubId else { return }
         
-        // Remove previous content
+   
         currentContentVC?.willMove(toParent: nil)
         currentContentVC?.view.removeFromSuperview()
         currentContentVC?.removeFromParent()
@@ -294,7 +292,7 @@ class ClubManagerViewController: UIViewController {
         }
     }
     
-    // MARK: - Data Loading
+
     private func loadManagerStatus() {
         activityIndicator.startAnimating()
         tabContainer.isHidden = true
@@ -335,14 +333,14 @@ class ClubManagerViewController: UIViewController {
             }
             updateContent()
             
-            // Select first tab
+        
             if let firstButton = tabStackView.arrangedSubviews.first as? UIButton {
                 tabTapped(firstButton)
             }
         }
     }
     
-    // MARK: - Helpers
+
     private func showError(_ error: Error) {
         showAlert(title: "Ошибка", message: error.localizedDescription)
     }

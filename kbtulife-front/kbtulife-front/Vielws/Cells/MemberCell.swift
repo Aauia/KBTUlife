@@ -1,4 +1,4 @@
-// Views/Cells/MemberCell.swift
+
 import UIKit
 
 class MemberCell: UITableViewCell {
@@ -61,11 +61,11 @@ class MemberCell: UITableViewCell {
         nameLabel.text = "\(member.firstName) \(member.lastName)"
         emailLabel.text = member.outlook
         
-        // Load avatar if URL is available
+
         if let avatarUrl = member.avatarUrl, let url = URL(string: avatarUrl) {
             loadImage(from: url)
         } else {
-            // Set default initials avatar
+
             avatarImageView.image = nil
             avatarImageView.backgroundColor = .systemBlue
         }
